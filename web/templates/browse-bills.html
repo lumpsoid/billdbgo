@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Browse bills</title>
+  </head>
+  <body>
+    <table>
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Date</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Exchange rate</th>
+        <th>Country</th>
+        <th>Tag</th>
+        <th>Link</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{ $reverse := .reverse }}
+      {{ range .bills }}
+      <tr>
+        <td><a href='{{ call $reverse "bill-view" .Id }}'>{{ .Id }}</a></td>
+        <td>{{.Name}}</td>
+        <td>{{.Date}}</td>
+        <td>{{.Price}}</td>
+        <td>{{.Currency}}</td>
+        <td>{{.ExchangeRate}}</td>
+        <td>{{.Country}}</td>
+        <td>{{.Tag}}</td>
+      </tr>
+      {{ end }}
+      </tbody>
+    </table>
+  
+  </body>
+</html>
