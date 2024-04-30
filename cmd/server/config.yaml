@@ -1,0 +1,4 @@
+db:
+  path: ./test.db
+templatespath: ../../web/templates/*
+staticpath: ../../web/static/

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <title>Simple Form</title>
+</head>
+
+<body>
+    <h1>Simple Form</h1>
+    <form id="myForm" action="/bill-form-request" method="post" target="_self">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="tag">Tag:</label>
+        <input type="text" id="tag" name="tag" required><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="price">Price:</label>
+        <input type="number" step="0.001" id="price" name="price" required><br>
+
+        <label for="currency">Currency:</label>
+        <input type="text" id="currency" name="currency" value="rsd"><br>
+
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" value="serbia"><br>
+
+        <label for="exchangeRate">Exchange Rate:</label>
+        <input type="number" step="0.001" id="exchange_rate" name="exchange_rate" value="1"><br>
+
+        <button>Submit</button>
+    </form>
+</body>
+
+</html>
