@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=680, initial-scale=1.0">
+  <title>BillDb</title>
+</head>
+
+<body>
+  <h1>BillDB</h1>
+  {{ with $x := index . "reverse" }}
+  <a href='{{ call $x "index" }}'>home</a>
+  <br>
+  <a href='{{call $x "bill-form"}}'>bill form</a>
+  <br>
+  <a href='{{call $x "bill-from-link"}}'>bill from link</a>
+  {{ end }}
+</body>
+
+</html>
