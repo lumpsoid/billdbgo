@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-  _ "modernc.org/sqlite"
 	log "github.com/sirupsen/logrus"
+	_ "modernc.org/sqlite"
 )
 
 type SqliteBillRepository struct {
@@ -20,7 +20,7 @@ func NewSqliteBillRepository(db *sql.DB) *SqliteBillRepository {
 
 // Implementation for getting the database
 func (r *SqliteBillRepository) GetDb() *sql.DB {
-  return r.DB
+	return r.DB
 }
 
 // Implementation for inserting a bill in the sqlite database
@@ -58,7 +58,31 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 	return nil
 }
 
-// Implementation for getting a bill from the database by ID
+func (r *SqliteBillRepository) GetBills() ([]*bl.Bill, error) {
+	query := `
+	SELECT
+		id, name, dates, price, currency, exchange_rate, country, tag, link, bill
+	FROM bills
+  LIMIT 20;
+  `
+	row, err := r.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var bills []*bl.Bill
+	for row.Next() {
+		bill, err := ScanToBill(row)
+		if err != nil {
+			return nil, err
+		}
+		bills = append(bills, bill)
+	}
+
+	return bills, nil
+}
+
+// fetching a bill from the database by ID without items
 func (r *SqliteBillRepository) GetBillByID(id int64) (*bl.Bill, error) {
 	query := `
 	SELECT
@@ -67,7 +91,7 @@ func (r *SqliteBillRepository) GetBillByID(id int64) (*bl.Bill, error) {
 	WHERE id = ?;
   `
 	row := r.DB.QueryRow(query, id)
-	bill, err := scanToBill(row)
+	bill, err := ScanToBill(row)
 	if err != nil {
 		log.Errorf("Error getting bill by id from db: %v", err)
 		return nil, err
@@ -275,7 +299,7 @@ func (r *SqliteBillRepository) CheckDuplicateBill(bill *bl.Bill) ([]*bl.Bill, er
 	var billArr []*bl.Bill
 
 	for rows.Next() {
-    b, err := scanToBill(rows)
+		b, err := ScanToBill(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -335,7 +359,7 @@ func (r *SqliteBillRepository) CheckUniqueItemNames() error {
 // to scan a row/rows into a bill/bills
 // you should use rows.Next()
 // and pass the rows to this function
-func scanToBill(row interface{}) (*bl.Bill, error) {
+func ScanToBill(row interface{}) (*bl.Bill, error) {
 	var (
 		Id           int64
 		Name         string

@@ -30,31 +30,31 @@ var (
 
 	BillFormSubmit = server.Post("/bill-form-request", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			r := new(Response)
+      r := make(map[string]interface{})
 			b := new(Bill)
 
 			err := c.Bind(b)
 			if err != nil {
 				return err
 			}
-			b.Id = time.Now().Local().UnixMilli()
+			b.Id = time.Now().Local().UnixNano()
 
 			billCurrency, err := B.StringToCurrency(b.Currency)
 			if err != nil {
-				r.Success = false
-				r.Message = fmt.Sprintf("%v", err)
+				r["success"] = false
+				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 			billCountry, err := B.StringToCountry(b.Country)
 			if err != nil {
-				r.Success = false
-				r.Message = fmt.Sprintf("%v", err)
+				r["success"] = false
+				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 			billDate, err := B.StringToDate(b.Date)
 			if err != nil {
-				r.Success = false
-				r.Message = fmt.Sprintf("%v", err)
+				r["success"] = false
+				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 
@@ -74,25 +74,25 @@ var (
 
 			billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
 			if err != nil {
-				r.Success = false
-				r.Message = fmt.Sprintf("%v", err)
+				r["success"] = false
+				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 			if len(billsDup) != 0 {
-				r.Success = false
-				r.Message = fmt.Sprintf("Find duplicates in the db = %d", len(billsDup))
+				r["success"] = false
+				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", len(billsDup))
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 
 			err = s.BillRepo.InsertBill(bill)
 			if err != nil {
-				r.Success = false
-				r.Message = "Error while inserting bill to db"
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				r["success"] = false
+				r["message"] = "Error while inserting bill to db"
+        return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
-			r.Success = true
-			r.Message = "Bill parsed successfully"
-			r.Bill = *b
+      r["success"] = true
+      r["message"] = "Bill parsed successfully"
+      r["bill"] = b
 			return c.Render(http.StatusOK, "bill-form-response.html", r)
 		}
 	})

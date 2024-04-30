@@ -83,5 +83,5 @@ func IdToUnix(id time.Time) int64 {
 }
 
 func UnixToId(id int64) time.Time {
-  return time.UnixMilli(id)
+  return time.Unix(0, id)
 }

@@ -464,7 +464,7 @@ func TestScanToBill(t *testing.T) {
     link,
     bill
     FROM bills WHERE id = ?`, b.Id.Local().UnixMilli())
-  bN, err := scanToBill(row)
+  bN, err := ScanToBill(row)
   if err != nil {
     t.Errorf("Failed to scan bill: %v", err)
     return
