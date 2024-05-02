@@ -15,13 +15,14 @@ RUN go build -o /billdb/server ./cmd/server/main.go
 
 # Production environment runs this stage
 FROM scratch
-ENV BILLDB_TEMPLATE_PATH=/billdb/templates/*
-ENV BILLDB_STATIC_PATH=/billdb/static
-ENV BILLDB_DB_PATH=/billdb/bills.db
-WORKDIR /billdb
+ENV BILLDB_TEMPLATE_PATH=/server/templates/*
+ENV BILLDB_STATIC_PATH=/server/static
+ENV BILLDB_DB_PATH=/server/data/bills.db
+WORKDIR /server
+RUN mkdir ./data
 COPY --from=build /billdb/server ./server
 COPY ./web/templates ./templates
 COPY ./web/static ./static
 EXPOSE 1323
 
-CMD ["/billdb/server"]
+CMD ["/server/server"]
