@@ -12,7 +12,6 @@ services:
       - ./web/templates:/billdb/templates
       - ./web/static:/billdb/static
       - ./cmd:/billdb/cmd
-      - ./api:/billdb/api
       - ./internal/:/billdb/internal
     restart: unless-stopped
 

@@ -9,7 +9,6 @@ RUN go mod download
 
 # Dev environment doesn't run this stage or beyond
 FROM base as build
-COPY ./api ./api
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 RUN go build -o /billdb/server ./cmd/server/main.go
