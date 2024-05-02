@@ -7,11 +7,13 @@ services:
     command: go run ./cmd/server/main.go
     ports:
       - "8080:1323"
+    environment:
+      - BILLDB_DB_PATH=/billdb/data/bills.db
     volumes:
-      - ./web/templates:/server/templates
-      - ./web/static:/server/static
-      - ./cmd:/server/cmd
-      - ./internal/:/server/internal
-      - ../billdb-docker-test/:/server/data
+      - ../billdb-docker-test/data:/billdb/data
+      - ./web/templates:/billdb/templates
+      - ./web/static:/billdb/static
+      - ./cmd:/billdb/cmd
+      - ./internal/:/billdb/internal
     restart: unless-stopped
 

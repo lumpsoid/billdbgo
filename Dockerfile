@@ -1,7 +1,7 @@
 FROM golang:alpine as base
 ENV BILLDB_TEMPLATE_PATH=/billdb/templates/*
 ENV BILLDB_STATIC_PATH=/billdb/static
-ENV BILLDB_DB_PATH=/billdb/bills.db
+ENV BILLDB_DB_PATH=/billdb/data/bills.db
 WORKDIR /billdb
 COPY ./go.mod ./
 COPY ./go.sum ./
