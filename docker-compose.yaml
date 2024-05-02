@@ -1,0 +1,18 @@
+services:
+  billdb-go:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    command: go run ./cmd/server/main.go
+    ports:
+      - "8080:1323"
+    volumes:
+      - ./bills.db:/billdb/bills.db
+      - ./web/templates:/billdb/templates
+      - ./web/static:/billdb/static
+      - ./cmd:/billdb/cmd
+      - ./api:/billdb/api
+      - ./internal/:/billdb/internal
+    restart: unless-stopped
+
