@@ -1,4 +1,4 @@
 db:
-  path: ./test.db
+  path: ./bills.db
 templatespath: ../../web/templates/*
 staticpath: ../../web/static/

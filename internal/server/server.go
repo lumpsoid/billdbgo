@@ -2,22 +2,41 @@ package server
 
 import (
 	"billdb/internal/repository"
+	"fmt"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
 
 type Config struct {
-  Db struct {
-    Path string
-  }
-  TemplatesPath string
-  StaticPath string
+	DbPath        string
+	TemplatesPath string
+	StaticPath    string
 }
 
 type Server struct {
-  Config Config
-  Echo     *echo.Echo
+	Config   *Config
+	Echo     *echo.Echo
 	BillRepo repository.BillRepository
+}
+
+func LoadConfig() (*Config, error) {
+	var cfg Config
+	var present bool
+
+	cfg.DbPath, present = os.LookupEnv("BILLDB_DB_PATH")
+	if !present {
+		return nil, fmt.Errorf("BILLDB_DB_PATH not set")
+	}
+	cfg.TemplatesPath, present = os.LookupEnv("BILLDB_TEMPLATE_PATH")
+	if !present {
+		return nil, fmt.Errorf("BILLDB_TEMPLATE_PATH not set")
+	}
+	cfg.StaticPath, present = os.LookupEnv("BILLDB_STATIC_PATH")
+	if !present {
+		return nil, fmt.Errorf("BILLDB_STATIC_PATH not set")
+	}
+	return &cfg, nil
 }
 
 func Get(path string, handler func(s *Server) echo.HandlerFunc) func(s *Server) *echo.Route {
