@@ -35,19 +35,19 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 
 		u, err := url.Parse(req.Link)
 		if err != nil {
-      r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Error while parsing url: %v", err)
 			return c.JSON(http.StatusBadRequest, r)
 		}
 
 		p, err := parser.GetBillParser(u)
 		if err != nil {
-      r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Error while getting parser for the url: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 
 		bill, err := p.Parse(u)
 		if err != nil {
-			r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Error while parsing the bill: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 		b := Bill{
@@ -63,9 +63,11 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 		}
 		r.Bill = []Bill{b}
 
+    c.Logger().Printf("Path to db: %v\n", s.Config.DbPath)
+
 		billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
 		if err != nil {
-			r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Duplicates error: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 		if len(billsDup) != 0 {
@@ -77,13 +79,13 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 
 		err = s.BillRepo.InsertBill(bill)
 		if err != nil {
-			r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Error while inserting a bill: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 
 		err = s.BillRepo.InsertItems(bill.Items)
 		if err != nil {
-			r.Message = fmt.Sprintf("%v", err)
+      r.Message = fmt.Sprintf("Error while inserting items: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 
