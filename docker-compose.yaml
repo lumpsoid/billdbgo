@@ -8,10 +8,10 @@ services:
     ports:
       - "8080:1323"
     volumes:
-      - ./bills.db:/billdb/bills.db
-      - ./web/templates:/billdb/templates
-      - ./web/static:/billdb/static
-      - ./cmd:/billdb/cmd
-      - ./internal/:/billdb/internal
+      - ./web/templates:/server/templates
+      - ./web/static:/server/static
+      - ./cmd:/server/cmd
+      - ./internal/:/server/internal
+      - ../billdb-docker-test/:/server/data
     restart: unless-stopped
 
