@@ -100,24 +100,19 @@ func fetchItems(
 	// The second element (index 1) is the first capture group
 	token := tokenSubmatches[1]
 
-	bodyJSON, err := json.Marshal(map[string]string{
-		"invoiceNumber": invoceNumber,
-		"token":         token,
-	})
-	if err != nil {
-		log.Error("Error marshalling json: ", err)
-		return nil, err
-	}
-	postR, err := http.Post(
-		"https://suf.purs.gov.rs//specifications",
-		"application/json",
-		strings.NewReader(string(bodyJSON)),
-	)
+  postR, err := http.PostForm(
+    "https://suf.purs.gov.rs//specifications",
+    url.Values{
+      "invoiceNumber": {invoceNumber},
+      "token": {token},
+    },
+  )
 	if err != nil {
 		log.Error(
 			"Error making post request: ", err)
 		return nil, err
 	}
+  defer postR.Body.Close()
 
 	if postR.StatusCode != 200 {
 		log.WithField("statusCode", postR.StatusCode).Error(
@@ -126,13 +121,13 @@ func fetchItems(
 	}
 
 	var rJson PostResponseJson
-
 	err = json.NewDecoder(postR.Body).Decode(&rJson)
 	if err != nil {
 		log.Error(
 			"Error decoding json items: ", err)
 		return nil, err
 	}
+  postR.Body.Close()
 
 	if !rJson.Success {
 		log.WithField("Success", rJson.Success).Error(
