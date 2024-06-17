@@ -26,7 +26,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 		req := new(RequestForm)
 		r := new(ResponseFlutter)
 		r.Success = "error"
-		r.Bill = make([]Bill, 0)
+		r.Bill = make([]BillApi, 0)
 		r.Force = false
 
 		err := c.Bind(req)
@@ -64,7 +64,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			"",
 			"",
 		)
-		b := Bill{
+		billApi := BillApi{
 			Timestamp:    bill.GetIdUnix(),
 			Name:         req.Name,
 			Date:         bill.GetDateString(),
@@ -84,7 +84,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 		}
 		if len(billsDup) != 0 {
 			r.Success = "duplicates"
-			b.Duplicates = len(billsDup)
+			billApi.Duplicates = len(billsDup)
 			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", len(billsDup))
 			return c.JSON(http.StatusOK, r)
 		}
@@ -96,7 +96,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 		}
 
 		r.Success = "success"
-		r.Bill = []Bill{b}
+		r.Bill = []BillApi{billApi}
 
 		return c.JSON(http.StatusOK, r)
 	}
