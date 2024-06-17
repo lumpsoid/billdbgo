@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	tokenXpath = "/html/head/script[5]"
+	tokenXpath = "/html/head/script[9]"
 	// for items fetch
 	invoiceXpath = "//*[@id='invoiceNumberLabel']"
 	priceXpath   = "//*[@id='totalAmountLabel']"
@@ -24,7 +24,7 @@ const (
 	billXpath    = "//*[@id='collapse3']/div/pre"
 	nameXpath    = "//*[@id='shopFullNameLabel']"
 	tokenRegex   = `viewModel\.Token\('(.*)'\);`
-	dateLayout   = "02.01.2006. 15:04:05"
+	dateLayout   = "2.1.2006. 15:04:05"
 )
 
 // Define a struct to represent your JSON data
@@ -100,19 +100,19 @@ func fetchItems(
 	// The second element (index 1) is the first capture group
 	token := tokenSubmatches[1]
 
-  postR, err := http.PostForm(
-    "https://suf.purs.gov.rs//specifications",
-    url.Values{
-      "invoiceNumber": {invoceNumber},
-      "token": {token},
-    },
-  )
+	postR, err := http.PostForm(
+		"https://suf.purs.gov.rs/specifications",
+		url.Values{
+			"invoiceNumber": {invoceNumber},
+			"token":         {token},
+		},
+	)
 	if err != nil {
 		log.Error(
 			"Error making post request: ", err)
 		return nil, err
 	}
-  defer postR.Body.Close()
+	defer postR.Body.Close()
 
 	if postR.StatusCode != 200 {
 		log.WithField("statusCode", postR.StatusCode).Error(
@@ -127,7 +127,7 @@ func fetchItems(
 			"Error decoding json items: ", err)
 		return nil, err
 	}
-  postR.Body.Close()
+	postR.Body.Close()
 
 	if !rJson.Success {
 		log.WithField("Success", rJson.Success).Error(
