@@ -4,7 +4,7 @@ import "billdb/internal/server"
 
 const baseApiPath = "/api/flutter"
 
-type Bill struct {
+type BillApi struct {
 	Timestamp    int64   `json:"timestamp"`
 	Name         string  `json:"name"`
 	Date         string  `json:"date"`
@@ -18,15 +18,15 @@ type Bill struct {
 }
 
 type ResponseFlutter struct {
-	Success string `json:"success"`
-	Message string `json:"message"`
-	Force   bool   `json:"force"`
-	Bill    []Bill `json:"bill"`
+	Success string    `json:"success"`
+	Message string    `json:"message"`
+	Force   bool      `json:"force"`
+	Bill    []BillApi `json:"bill"`
 }
 
 func FlutterApiRoutes(s *server.Server) {
-  QrHandler(s)
-  FormHandler(s)
-  GetTagsHandler(s)
-  GetCurrenciesHandler(s)
+	QrHandler(s)
+	FormHandler(s)
+	GetTagsHandler(s)
+	GetCurrenciesHandler(s)
 }
