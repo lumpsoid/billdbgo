@@ -7,12 +7,13 @@ import (
 	web "billdb/internal/server/webapi"
 	"context"
 	"database/sql"
-  _ "modernc.org/sqlite"
 	"html/template"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	_ "modernc.org/sqlite"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -21,7 +22,7 @@ import (
 )
 
 func main() {
-  cfg, err := server.LoadConfig()
+	cfg, err := server.LoadConfig()
 
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
@@ -31,12 +32,12 @@ func main() {
 		logger.Fatal("Error on sqlite3 db open")
 		return
 	}
-  defer db.Close()
+	defer db.Close()
 
 	billRepo := repository.NewSqliteBillRepository(db)
 	s := server.Server{
 		BillRepo: billRepo,
-    Config: cfg,
+		Config:   cfg,
 	}
 
 	t := &server.Template{
@@ -47,8 +48,8 @@ func main() {
 
 	e.Renderer = t
 
-  // call to /index-style.css will redirect to cfg.StaticPath/index-style.css
-  e.Static("/", cfg.StaticPath)
+	// call to /index-style.css will redirect to cfg.StaticPath/index-style.css
+	e.Static("/static", cfg.StaticPath)
 
 	e.Logger.SetLevel(log.INFO)
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
@@ -67,8 +68,7 @@ func main() {
 	s.Echo = e
 	// handlers
 	web.RegisterWebRoutes(&s)
-  flutter.FlutterApiRoutes(&s)
-  
+	flutter.FlutterApiRoutes(&s)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
