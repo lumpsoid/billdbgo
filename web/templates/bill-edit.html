@@ -9,7 +9,8 @@
 </head>
 
 <body>
-  <h2>Edit bill: {{.id}}</h2>
+  <h2 style="display: inline;">Edit bill: {{.id}}</h2>
+  <a href="{{call .reverse "bill-view" .id}}">Back to view</a>
   <form hx-target="body" hx-post="{{call .reverse "bill-edit" .id}}" >
     <table>
       <thead>
