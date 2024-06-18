@@ -10,7 +10,10 @@
 
 <body>
   <div id="bill">
-    <h2>Bill details</h2>
+    <div>
+      <h2 style="display: inline;">Bill details</h2>
+      <a href="{{call .reverse "bill-edit" .id}}">edit</a>
+    </div>
     <table>
       <tr>
         <td>Id</td>
