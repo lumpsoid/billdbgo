@@ -13,7 +13,7 @@ func RegisterWebRoutes(s *server.Server) {
 	h.BillFromLinkResponse(s)
 	h.SaveDb(s)
 	h.BillView(s).Name = "bill-view"
-	h.BillBrowse(s).Name = "bill-browse"
+	h.BillBrowse(s).Name = "bills"
 	h.BillEditPage(s).Name = "bill-edit"
 	h.BillEditSubmit(s)
 }

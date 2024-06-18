@@ -9,7 +9,6 @@
     <table>
       <thead>
       <tr>
-        <th>Id</th>
         <th>Name</th>
         <th>Date</th>
         <th>Price</th>
@@ -17,14 +16,12 @@
         <th>Exchange rate</th>
         <th>Country</th>
         <th>Tag</th>
-        <th>Link</th>
       </tr>
       </thead>
       <tbody>
       {{ $reverse := .reverse }}
       {{ range .bills }}
       <tr>
-        <td><a href='{{ call $reverse "bill-view" .Id }}'>{{ .Id }}</a></td>
         <td>{{.Name}}</td>
         <td>{{.Date}}</td>
         <td>{{.Price}}</td>
@@ -32,6 +29,7 @@
         <td>{{.ExchangeRate}}</td>
         <td>{{.Country}}</td>
         <td>{{.Tag}}</td>
+        <td><a href='{{ call $reverse "bill-view" .Id }}'>open</a></td>
       </tr>
       {{ end }}
       </tbody>
