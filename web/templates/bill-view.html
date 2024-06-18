@@ -1,33 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-  </head>
-  <body>
-    <div id="bill">
-    <h2>Bill: {{.id}}</h2>
-    <p>Name: {{.name}}</p>
-    <p>Date: {{.date}}</p>
-    <p>Price: {{.price}}</p>
-    <p>Currency: {{.currency}}</p>
-    <p>Exchange rate: {{.exchange_rate}}</p>
-    <p>Country: {{.country}}</p>
-    <p>Tag: "{{.tag}}"</p>
-    <a href="{{.link}}">link to gov site</a>
-    </div>
-    <h2>Items</h2>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="/static/3p/htmx1.9.12.min.js"></script>
+  <title></title>
+</head>
+
+<body>
+  <div id="bill">
+    <h2>Bill details</h2>
     <table>
-      <thead>
+      <tr>
+        <td>Id</td>
+        <td>{{.id}}</td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>{{.name}}</td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td>{{.date}}</td>
+      </tr>
+      <tr>
+        <td>Price</td>
+        <td>{{.price}}</td>
+      </tr>
+      <tr>
+        <td>Currency</td>
+        <td>{{.currency}}</td>
+      </tr>
+      <tr>
+        <td>Exchange rate</td>
+        <td>{{.exchange_rate}}</td>
+      </tr>
+      <tr>
+        <td>Country</td>
+        <td>{{.country}}</td>
+      </tr>
+      <tr>
+        <td>Tag</td>
+        <td>"{{.tag}}"</td>
+      </tr>
+      <tr>
+        <td>Bill check</td>
+        <td><a href="{{.link}}">link</a></td>
+      </tr>
+    </table>
+  </div>
+  <h2>Items</h2>
+  <table>
+    <thead>
       <tr>
         <th>Name</th>
         <th>Price</th>
         <th>Price One</th>
         <th>Quantity</th>
       </tr>
-      </thead>
-      <tbody>
+    </thead>
+    <tbody>
       {{ range $item := .items }}
       <tr>
         <td>{{$item.Name}}</td>
@@ -36,8 +69,9 @@
         <td>{{$item.Quantity}}</td>
       </tr>
       {{ end }}
-      </tbody>
-    </table>
-  
-  </body>
+    </tbody>
+  </table>
+
+</body>
+
 </html>
