@@ -1,0 +1,82 @@
+{{if .success}}
+<h2>Successful update</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Previous</th>
+      <th>New</th>
+    </tr>
+  </thead>
+  {{if ne .nName .cName}}
+  <tr>
+    <td>Name</td>
+    <td>`{{.cName}}`</td>
+    <td>`{{.nName}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nDate .cDate}}
+  <tr>
+    <td>Date</td>
+    <td>`{{.cDate}}`</td>
+    <td>`{{.nDate}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nPrice .cPrice}}
+  <tr>
+    <td>Price</td>
+    <td>`{{.cPrice}}`</td>
+    <td>`{{.nPrice}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nCurrency .cCurrency}}
+  <tr>
+    <td>Currency</td>
+    <td>`{{.cCurrency}}`</td>
+    <td>`{{.nCurrency}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nExchangeRate .cExchangeRate}}
+  <tr>
+    <td>Exchange rate</td>
+    <td>`{{.cExchangeRate}}`</td>
+    <td>`{{.nExchangeRate}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nCountry .cCountry}}
+  <tr>
+    <td>Country</td>
+    <td>`{{.cCountry}}`</td>
+    <td>`{{.nCountry}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nTag .cTag}}
+  <tr>
+    <td>Tag</td>
+    <td>`{{.cTag}}`</td>
+    <td>`{{.nTag}}`</td>
+  </tr>
+  {{end}}
+  {{if ne .nLink .cLink}}
+  <tr>
+    <td>Link to bill</td>
+    <td>`{{.cLink}}`</td>
+    <td>`{{.nLink}}`</td>
+  </tr>
+  {{end}}
+</table>
+<div><a href="{{call .reverse "bill-edit" .id}}">Edit bill</a></div>
+<div>
+  <a href="{{call .reverse "bill-view" .id}}">View bill</a>
+</div>
+<div>
+  <a href="{{call .reverse "bills"}}">Bills list</a>
+</div>
+{{else}}
+<h2>Failed update</h2>
+<p>{{.error}}</p>
+<p>Reload to get back to form.</p>
+<div>
+  <a href="{{call .reverse "bill-view" .id}}">View bill</a>
+</div>
+{{end}}
