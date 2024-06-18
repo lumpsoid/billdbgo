@@ -1,6 +1,8 @@
 package bill
 
 import (
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -51,37 +53,79 @@ func (b *Bill) AddItem(item *Item) {
 }
 
 func (b *Bill) GetIdUnix() int64 {
-  return b.Id.Local().UnixNano()
+	return b.Id.Local().UnixNano()
 }
 
 func (b *Bill) GetDateString() string {
-  return b.Date.Format("2006-01-02")
+	return b.Date.Format("2006-01-02")
 }
 
 func (b *Bill) GetCurrencyString() string {
-  return currencyToString[b.Currency]
+	return currencyToString[b.Currency]
 }
 
 func (b *Bill) GetCountryString() string {
-  return countryToString[b.Country]
+	return countryToString[b.Country]
+}
+
+func UpdateBillProperty(bill *Bill, property string, value interface{}) error {
+	switch property {
+	case "name":
+		bill.Name = strings.Trim(value.(string), " ,\t-")
+	case "date":
+		dateNew, err := StringToDate(value.(string))
+		if err != nil {
+			return err
+		}
+		bill.Date = *dateNew
+	case "price":
+		priceNew, err := strconv.ParseFloat(value.(string), 64)
+		if err != nil {
+			return err
+		}
+		bill.Price = priceNew
+	case "currency":
+		currencyNew, err := StringToCurrency(value.(string))
+		if err != nil {
+			return err
+		}
+		bill.Currency = currencyNew
+	case "exchange_rate":
+		exchangeRateNew, err := strconv.ParseFloat(value.(string), 64)
+		if err != nil {
+			return err
+		}
+		bill.ExchangeRate = exchangeRateNew
+	case "country":
+		countryNew, err := StringToCountry(value.(string))
+		if err != nil {
+			return err
+		}
+		bill.Country = countryNew
+	case "tag":
+		bill.Tag = Tag(value.(string))
+	case "link":
+		bill.Link = value.(string)
+	}
+	return nil
 }
 
 func DateToString(date time.Time) string {
-  return date.Format("2006-01-02")
+	return date.Format("2006-01-02")
 }
 
 func StringToDate(date string) (*time.Time, error) {
-  t, err := time.Parse("2006-01-02", date)
-  if err != nil {
-    return nil, err
-  }  
-  return &t, nil
+	t, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		return nil, err
+	}
+	return &t, nil
 }
 
 func IdToUnix(id time.Time) int64 {
-  return id.Local().UnixMilli()
+	return id.Local().UnixMilli()
 }
 
 func UnixToId(id int64) time.Time {
-  return time.Unix(0, id)
+	return time.Unix(0, id)
 }

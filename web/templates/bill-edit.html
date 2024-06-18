@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/static/3p/htmx1.9.12.min.js"></script>
+  <title></title>
+</head>
+
+<body>
+  <h2>Edit bill: {{.id}}</h2>
+  <form hx-target="body" hx-post="{{call .reverse "bill-edit" .id}}" >
+    <table>
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th>Current</th>
+          <th>New</th>
+        </tr>
+      </thead>
+      <tr>
+        <td>Name</td>
+        <td>{{.name}}</td>
+        <td>
+          <input type="text" name="name" id="name" />
+        </td>
+      </tr>
+      <tr>
+        <td>Date</td>
+        <td>{{.date}}</td>
+        <td>
+          <input type="date" name="date" id="date" />
+        </td>
+      </tr>
+      <tr>
+        <td>Price</td>
+        <td>{{.price}}</td>
+        <td>
+          <input type="number" step="0.001" name="price" id="price" />
+        </td>
+      </tr>
+      <tr>
+        <td>Currency</td>
+        <td>{{.currency}}</td>
+        <td>
+          <input type="text" id="currency" name="currency" list="currencies">
+          <datalist id="currencies">
+            {{range .currencies}}
+            <option value="{{.}}">{{ .}}</option>
+            {{end}}
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Exchange rate</td>
+        <td>{{.exchange_rate}}</td>
+        <td>
+          <input type="number" step="0.001" name="exchange_rate" id="exchange_rate" />
+        </td>
+      </tr>
+      <tr>
+        <td>Country</td>
+        <td>{{.country}}</td>
+        <td>
+          <input type="text" id="country" name="country" list="countries">
+          <datalist id="countries">
+            {{range .countries}}
+            <option value="{{.}}">{{.}}</option>
+            {{end}}
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Tag</td>
+        <td>{{.tag}}</td>
+        <td>
+          <input type="text" id="tag" name="tag" list="tags" />
+          <datalist id="tags">
+            {{range .tags}}
+            <option value="{{.}}">{{.}}</option>
+            {{end}}
+          </datalist>
+        </td>
+      </tr>
+      <tr>
+        <td>Link</td>
+        <td><a href="{{.link}}">link</a></td>
+        <td>
+          <input type="url" name="link" id="link" />
+        </td>
+      </tr>
+    </table>
+    <div>
+      <button type="submit">
+        Update
+      </button>
+    </div>
+  </form>
+</body>
+
+</html>
