@@ -53,7 +53,7 @@ var (
 				})
 			}
 
-			return c.Render(http.StatusOK, "browse-bills.html", map[string]interface{}{
+			return c.Render(http.StatusOK, "bills-browse.html", map[string]interface{}{
 				"bills": billsResponse,
 			})
 		}
