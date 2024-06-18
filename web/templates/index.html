@@ -9,13 +9,21 @@
 
 <body>
   <h1>BillDB</h1>
-  {{ with $x := index . "reverse" }}
-  <a href='{{ call $x "index" }}'>home</a>
-  <br>
-  <a href='{{call $x "bill-form"}}'>bill form</a>
-  <br>
-  <a href='{{call $x "bill-from-link"}}'>bill from link</a>
-  {{ end }}
+  <h2>Add bill</h2>
+  <ul>
+    <li>
+      <a href='{{call .reverse "bill-form"}}'>Form</a>
+    </li>
+    <li>
+      <a href='{{call .reverse "bill-from-link"}}'>Link</a>
+    </li>
+  </ul>
+  <h2>Management</h2>
+  <ul>
+    <li>
+      <a href="{{call .reverse "db-save"}}">Backup db</a>
+    </li>
+  </ul>
 </body>
 
 </html>
