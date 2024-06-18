@@ -11,7 +11,9 @@ func RegisterWebRoutes(s *server.Server) {
 	h.BillFormSubmit(s)
 	h.BillFromLink(s).Name = "bill-from-link"
 	h.BillFromLinkResponse(s)
-  h.SaveDb(s)
-  h.BillView(s).Name = "bill-view"
-  h.BillBrowse(s).Name = "bill-browse"
+	h.SaveDb(s)
+	h.BillView(s).Name = "bill-view"
+	h.BillBrowse(s).Name = "bill-browse"
+	h.BillEditPage(s).Name = "bill-edit"
+	h.BillEditSubmit(s)
 }

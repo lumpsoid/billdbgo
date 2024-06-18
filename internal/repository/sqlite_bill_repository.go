@@ -93,7 +93,6 @@ func (r *SqliteBillRepository) GetBillByID(id int64) (*bl.Bill, error) {
 	row := r.DB.QueryRow(query, id)
 	bill, err := ScanToBill(row)
 	if err != nil {
-		log.Errorf("Error getting bill by id from db: %v", err)
 		return nil, err
 	}
 
@@ -125,7 +124,6 @@ func (r *SqliteBillRepository) UpdateBill(bill *bl.Bill) error {
 		bill.GetIdUnix(),
 	)
 	if err != nil {
-		log.Errorf("Error updating bill by id in db: %v", err)
 		return err
 	}
 
@@ -239,6 +237,77 @@ func (r *SqliteBillRepository) DeleteItems(billId int64) error {
 		return err
 	}
 	return nil
+}
+
+func (r *SqliteBillRepository) GetCountries() ([]string, error) {
+	rows, err := r.DB.Query("SELECT DISTINCT country FROM bills;")
+	if err != nil {
+		log.Error("Error getting countries from db: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	countries := []string{}
+	for rows.Next() {
+		var country string
+		err := rows.Scan(&country)
+		if err != nil {
+			log.Error("Error scanning countries from db: ", err)
+			return nil, err
+		}
+		countries = append(countries, country)
+	}
+	return countries, nil
+}
+
+func (r *SqliteBillRepository) GetCurrencies() ([]string, error) {
+	rows, err := r.DB.Query("SELECT DISTINCT currency FROM bills;")
+	if err != nil {
+		log.Error("Error getting currencies from db: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	currencies := []string{}
+	for rows.Next() {
+		var currency string
+		err := rows.Scan(&currency)
+		if err != nil {
+			log.Error("Error scanning currencies from db: ", err)
+			return nil, err
+		}
+		currencies = append(currencies, currency)
+	}
+	return currencies, nil
+}
+
+func (r *SqliteBillRepository) GetTags() ([]string, error) {
+	rows, err := r.DB.Query(`
+    SELECT DISTINCT tag 
+    FROM bills 
+    WHERE tag IS NOT NULL 
+    AND tag <> ''
+    UNION
+    SELECT DISTINCT tag 
+    FROM items_meta 
+    WHERE tag IS NOT NULL 
+    AND tag <> '';
+    `)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tags []string
+	for rows.Next() {
+		var tag string
+		err := rows.Scan(&tag)
+		if err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, nil
 }
 
 // createTables creates necessary tables in the SQLite database.
