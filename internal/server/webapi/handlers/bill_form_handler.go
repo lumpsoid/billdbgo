@@ -22,15 +22,15 @@ type Bill struct {
 }
 
 var (
-	BillFormPage = server.Get("/bill-form", func(s *server.Server) echo.HandlerFunc {
+	BillFormPage = server.Get("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			return c.Render(http.StatusOK, "bill-form.html", nil)
 		}
 	})
 
-	BillFormSubmit = server.Post("/bill-form-request", func(s *server.Server) echo.HandlerFunc {
+	BillFormSubmit = server.Post("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
-      r := make(map[string]interface{})
+			r := make(map[string]interface{})
 			b := new(Bill)
 
 			err := c.Bind(b)
@@ -81,6 +81,7 @@ var (
 			if len(billsDup) != 0 {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", len(billsDup))
+				r["dupId"] = billsDup[0].GetIdUnix()
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 
@@ -88,11 +89,11 @@ var (
 			if err != nil {
 				r["success"] = false
 				r["message"] = "Error while inserting bill to db"
-        return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
-      r["success"] = true
-      r["message"] = "Bill parsed successfully"
-      r["bill"] = b
+			r["success"] = true
+			r["message"] = "Bill parsed successfully"
+			r["bill"] = b
 			return c.Render(http.StatusOK, "bill-form-response.html", r)
 		}
 	})

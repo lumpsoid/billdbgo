@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-  </head>
-  <body>
-    {{ if .success }}
-    <h2>Bill added successfully</h2>
-    <p>Id: <a href='{{ call .reverse "bill-view" .bill.Id}}'>{{ .bill.Id }}</a></p>
-    <p>Name: {{ .bill.Name }}</p>
-    <p>Tags: {{ .bill.Tag }}</p>
-    <p>Date: {{ .bill.Date }}</p>
-    <p>Price: {{ .bill.Price }}</p>
-    <p>Currency: {{ .bill.Currency }}</p>
-    <p>Exchange rate: {{ .bill.ExchangeRate }}</p>
-    <p>Country: {{ .bill.Country }}</p>
-    {{ else }}
-    <h2>Failed to add bill</h2>
-    <p>{{ .message }}</p>
-    {{ end }}
-<a href="/bill-form">Submit new form</a>
-  
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+  {{ if .success }}
+  <h2 style="display: inline;">Bill added successfully</h2>
+  <a href="{{ call .reverse "bill-view" .bill.Id}}">View</a>
+
+  <p>Id: {{ .bill.Id }}</p>
+  <p>Name: {{ .bill.Name }}</p>
+  <p>Tags: {{ .bill.Tag }}</p>
+  <p>Date: {{ .bill.Date }}</p>
+  <p>Price: {{ .bill.Price }}</p>
+  <p>Currency: {{ .bill.Currency }}</p>
+  <p>Exchange rate: {{ .bill.ExchangeRate }}</p>
+  <p>Country: {{ .bill.Country }}</p>
+  {{ else }}
+  <h2>Failed to add bill</h2>
+  <p>{{ .message }}</p>
+  {{if .dupId}}
+  <li>
+  <a href="{{call .reverse "bill-view" .dupId}}">View duplicate</a>
+  </li>
+  {{end}}
+  {{ end }}
+  <a href="{{call .reverse "bill-form"}}">Submit new form</a>
+
+</body>
+
 </html>
