@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <h1>BillDB</h1>
+  <h1>Expenses management</h1>
   <h2>Add bill</h2>
   <ul>
     <li>
@@ -20,6 +20,9 @@
   </ul>
   <h2>Management</h2>
   <ul>
+    <li>
+      <a href="{{call .reverse "bills"}}">View bills</a>
+    </li>
     <li>
       <a href="{{call .reverse "db-save"}}">Backup db</a>
     </li>
