@@ -10,7 +10,7 @@ import (
 var Index = server.Get("/", func(s *server.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.Render(http.StatusOK, "index.html", map[string]interface{}{
-			"name": "Mat!",
+			"version": "0.1.3",
 		})
 	}
 })
