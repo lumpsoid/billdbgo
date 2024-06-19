@@ -64,6 +64,7 @@
       </tr>
     </thead>
     <tbody>
+      {{ if len .items }}
       {{ range $item := .items }}
       <tr>
         <td>{{$item.Name}}</td>
@@ -72,10 +73,14 @@
         <td>{{$item.Quantity}}</td>
       </tr>
       {{ end }}
+      {{ else }}
+      <tr>
+        <td colspan="4">No items</td>
+      </tr>
+      {{ end }}
     </tbody>
   </table>
-  <a href="{{call .reverse "bills"}}">Back to list</a>
-
+  <a href="{{call .reverse "bills-landing"}}">Bills main</a>
 </body>
 
 </html>
