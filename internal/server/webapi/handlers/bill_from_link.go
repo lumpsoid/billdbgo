@@ -26,8 +26,7 @@ var BillFromLink = server.Get("/bill-from-link", func(s *server.Server) echo.Han
 var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var r Response
-		var link string
-		link = c.FormValue("link")
+		link := c.FormValue("link")
 
 		u, err := url.Parse(link)
 		if err != nil {
