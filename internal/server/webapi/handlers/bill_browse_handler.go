@@ -97,8 +97,10 @@ var (
 			prevMonth := timeRequested.AddDate(0, -1, 0)
 			r["prevPage"] = c.Echo().Reverse("bills", prevMonth.Year(), int(prevMonth.Month()))
 
-			r["success"] = true
 			r["bills"] = billsResponse
+			r["year"] = year
+			r["month"] = fmt.Sprintf("%02d", month)
+			r["success"] = true
 			return c.Render(http.StatusOK, "bills-browse.html", r)
 		}
 	})
