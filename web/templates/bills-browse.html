@@ -6,6 +6,7 @@
     <title>Browse bills</title>
   </head>
   <body>
+    {{ if .success }}
     <table>
       <thead>
       <tr>
@@ -34,6 +35,14 @@
       {{ end }}
       </tbody>
     </table>
+    {{ if .nextPage }} <a href="{{ .nextPage }}">Next</a> | {{end}}
+    <a href="{{ .prevPage }}">Previous</a>
+    <br>
+    {{ else }}
+    <h2>Failed to get bills</h2>
+    <p>{{.message}}</p>
+    <a href="{{ call .reverse "bills-landing" }}">Current month's bills</a> |
+    {{ end }}
     <a href="/">Back to main</a>
   </body>
 </html>
