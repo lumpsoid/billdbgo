@@ -21,6 +21,7 @@
       </tr>
       </thead>
       <tbody>
+      {{ if len .bills }}
       {{ $reverse := .reverse }}
       {{ range .bills }}
       <tr>
@@ -34,6 +35,11 @@
         <td><a href='{{ call $reverse "bill-view" .Id }}'>open</a></td>
       </tr>
       {{ end }}
+      {{else}}
+      <tr>
+        <td colspan="7">No bills found</td>
+      </tr>
+      {{end}}
       </tbody>
     </table>
     {{ if .nextPage }} <a href="{{ .nextPage }}">Next</a> | {{end}}
