@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/static/3p/htmx.2.0.0.min.js"></script>
+  <title>Search bills</title>
+</head>
+
+<body>
+  <h1>Search</h1>
+  <div>
+    <button hx-get="{{ call .reverse "bills-search" }}" hx-target="#search-variant">
+      Bills
+    </button>
+    <button hx-get="{{ call .reverse "items-search" }}" hx-target="#search-variant">
+      Items
+    </button>
+  </div>
+  <div id="search-variant">
+    {{ template "search-bills.html" . }}
+  </div>
+  <a href="/">Home</a>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+<div>
+  <input type="search" id="items-search" name="q" placeholder="Begin Typing To Search Items..."
+    hx-post="{{call .reverse "items-search"}}" hx-trigger="input changed delay:500ms, search" hx-target="#result" />
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>PriceOne</th>
+      <th>Quantity</th>
+      <th>Tag</th>
+    </tr>
+  </thead>
+  <tbody id="result">
+  </tbody>
+</table>
+</div>

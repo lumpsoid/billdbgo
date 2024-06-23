@@ -19,4 +19,9 @@ func RegisterWebRoutes(s *server.Server) {
 	h.BillView(s).Name = "bill-view"
 	h.BillEditPage(s).Name = "bill-edit"
 	h.BillEditSubmit(s)
+	h.SearchPage(s).Name = "search"
+	h.BillsSearch(s).Name = "bills-search"
+	h.BillSearchQueary(s)
+	h.ItemsSearch(s).Name = "items-search"
+	h.ItemsSearchQueary(s)
 }

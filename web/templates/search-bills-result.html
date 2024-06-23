@@ -1,0 +1,16 @@
+{{ if .success }}
+{{ range .result }}
+<tr>
+  <td>{{ .Name }}</td>
+  <td>{{ .Tag }}</td>
+  <td>{{ .Date }}</td>
+  <td>{{ .Price }}</td>
+  <td>{{ .Currency }}</td>
+  <td>{{ .Country }}</td>
+  <td><a href="{{ call $.reverse "bill-view" .Id}}">view</a></td>
+  <td><a href="{{ call $.reverse "bill-edit" .Id}}">edit</a></td>
+</tr>
+{{ end }}
+{{ else }}
+<td colspan="7">No result</td>
+{{ end }}
