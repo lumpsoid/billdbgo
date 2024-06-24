@@ -2,12 +2,13 @@ services:
   billdb-go:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/Dockerfile
       target: base
     command: go run ./cmd/server/main.go
     ports:
       - "8080:1323"
     environment:
+      - CGO_ENABLED=1
       - BILLDB_DB_PATH=/billdb/data/bills.db
     volumes:
       - ../billdb-docker-test/data:/billdb/data

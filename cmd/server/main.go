@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"time"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -22,12 +22,16 @@ import (
 )
 
 func main() {
-	cfg, err := server.LoadConfig()
-
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
-	db, err := sql.Open("sqlite", cfg.DbPath)
+	cfg, err := server.LoadConfig()
+	if err != nil {
+		logger.Fatal("Error on config load")
+		return
+	}
+
+	db, err := sql.Open("sqlite3", cfg.DbPath)
 	if err != nil {
 		logger.Fatal("Error on sqlite3 db open")
 		return

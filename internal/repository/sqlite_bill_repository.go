@@ -7,7 +7,6 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	_ "modernc.org/sqlite"
 )
 
 type SqliteBillRepository struct {

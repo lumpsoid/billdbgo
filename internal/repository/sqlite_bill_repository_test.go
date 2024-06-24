@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func setUpDB(t *testing.T) (*SqliteBillRepository, error) {
