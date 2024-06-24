@@ -56,3 +56,9 @@ func Post(path string, handler func(s *Server) echo.HandlerFunc) func(s *Server)
 		return s.Echo.POST(path, handler(s))
 	}
 }
+
+func Put(path string, handler func(s *Server) echo.HandlerFunc) func(s *Server) *echo.Route {
+	return func(s *Server) *echo.Route {
+		return s.Echo.PUT(path, handler(s))
+	}
+}
