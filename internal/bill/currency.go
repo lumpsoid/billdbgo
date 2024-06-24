@@ -5,24 +5,40 @@ import "fmt"
 type Currency int
 
 const (
-	EUR Currency = iota
+	EUR Currency = iota // int 0
 	RSD
 	TRY
 	RUB
+	USD
 )
 
-// Map string values to enum values
-var currencyMap = map[string]Currency{
-	"eur": EUR,
-	"rsd": RSD,
-	"try": TRY,
+// must be aligned with the Currency enum
+var currencyToString = []string{
+	"eur", "rsd", "try", "rub", "usd",
 }
 
-var currencyToString = []string{"eur", "rsd", "try", "rub"}
+func (c Currency) String() string {
+	return currencyToString[c]
+}
 
-func StringToCurrency(s string) (Currency, error) {
-	if currency, ok := currencyMap[s]; ok {
-		return currency, nil
+func GetCurrencyList() []string {
+	currencyList := append([]string{}, currencyToString...)
+	return currencyList
+}
+
+func StringToCurrency(currencyStr string) (Currency, error) {
+	switch currencyStr {
+	case "usd":
+		return USD, nil
+	case "eur":
+		return EUR, nil
+	case "rsd":
+		return RSD, nil
+	case "try":
+		return TRY, nil
+	case "rub":
+		return RUB, nil
+	default:
+		return -1, fmt.Errorf("Currency %s not found", currencyStr)
 	}
-	return -1, fmt.Errorf("Currency %s not found", s)
 }

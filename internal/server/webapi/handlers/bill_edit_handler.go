@@ -20,10 +20,7 @@ var (
 			if err != nil {
 				return err
 			}
-			currencies, err := s.BillRepo.GetCurrencies()
-			if err != nil {
-				return err
-			}
+			currencies := B.GetCurrencyList()
 			countries, err := s.BillRepo.GetCountries()
 			if err != nil {
 				return err
