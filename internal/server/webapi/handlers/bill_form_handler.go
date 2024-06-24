@@ -25,10 +25,7 @@ var (
 	BillFormPage = server.Get("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			currencies := B.GetCurrencyList()
-			countries, err := s.BillRepo.GetCountries()
-			if err != nil {
-				return err
-			}
+			countries := B.GetCountryList()
 			tags, err := s.BillRepo.GetTags()
 			if err != nil {
 				return err

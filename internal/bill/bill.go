@@ -65,7 +65,7 @@ func (b *Bill) GetCurrencyString() string {
 }
 
 func (b *Bill) GetCountryString() string {
-	return countryToString[b.Country]
+	return b.Country.String()
 }
 
 func UpdateBillProperty(bill *Bill, property string, value interface{}) error {

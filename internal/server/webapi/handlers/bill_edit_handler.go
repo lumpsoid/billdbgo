@@ -21,10 +21,7 @@ var (
 				return err
 			}
 			currencies := B.GetCurrencyList()
-			countries, err := s.BillRepo.GetCountries()
-			if err != nil {
-				return err
-			}
+			countries := B.GetCountryList()
 			tags, err := s.BillRepo.GetTags()
 			if err != nil {
 				return err
@@ -58,7 +55,7 @@ var (
 				r["error"] = "Error parsing id from url path"
 				return c.Render(
 					http.StatusOK,
-					"bill-edit-modal-validate.html",
+					"bill-edit-result.html",
 					r,
 				)
 			}
@@ -95,7 +92,7 @@ var (
 					r["error"] = err
 					return c.Render(
 						http.StatusOK,
-						"bill-edit-modal-validate.html",
+						"bill-edit-result.html",
 						r,
 					)
 				}
@@ -106,7 +103,7 @@ var (
 				r["error"] = "Error updating bill in db."
 				return c.Render(
 					http.StatusOK,
-					"bill-edit-modal-validate.html",
+					"bill-edit-result.html",
 					r,
 				)
 			}
