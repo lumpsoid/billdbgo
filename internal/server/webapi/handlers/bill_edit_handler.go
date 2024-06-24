@@ -51,7 +51,7 @@ var (
 		}
 	})
 
-	BillEditSubmit = server.Post("/bill/:id/edit", func(s *server.Server) echo.HandlerFunc {
+	BillEditSubmit = server.Put("/bill/:id/edit", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			r := make(map[string]interface{})
 			r["success"] = false
