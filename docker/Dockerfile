@@ -5,8 +5,7 @@ ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
 WORKDIR /billdb
 COPY ./go.mod ./
 COPY ./go.sum ./
-RUN apk add gcc
-RUN apk add g++
+RUN apk add gcc musl-dev
 RUN go mod download
 
 # Dev environment doesn't run this stage or beyond
