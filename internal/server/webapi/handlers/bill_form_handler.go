@@ -24,7 +24,23 @@ type Bill struct {
 var (
 	BillFormPage = server.Get("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return c.Render(http.StatusOK, "bill-form.html", nil)
+			currencies, err := s.BillRepo.GetCurrencies()
+			if err != nil {
+				return err
+			}
+			countries, err := s.BillRepo.GetCountries()
+			if err != nil {
+				return err
+			}
+			tags, err := s.BillRepo.GetTags()
+			if err != nil {
+				return err
+			}
+			return c.Render(http.StatusOK, "bill-form.html", map[string]interface{}{
+				"currencies": currencies,
+				"countries":  countries,
+				"tags":       tags,
+			})
 		}
 	})
 

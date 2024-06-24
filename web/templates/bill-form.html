@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/bill-form.css">
     <script src="/static/3p/htmx.2.0.0.min.js"></script>
-    <title>Simple Form</title>
+    <title>Add bill</title>
 </head>
 
 <body>
@@ -16,7 +16,12 @@
         <input type="text" id="name" name="name" required><br>
 
         <label for="tag">Tag:</label>
-        <input type="text" id="tag" name="tag" required><br>
+        <input type="text" id="tag" name="tag" list="tags" required>
+            <datalist id="tags">
+            {{range .tags}}
+            <option value="{{.}}">{{.}}</option>
+            {{end}}
+            </datalist><br>
 
         <label for="date">Date:</label>
         <input type="date" id="date" name="date" required><br>
@@ -25,10 +30,22 @@
         <input type="number" step="0.001" id="price" name="price" required><br>
 
         <label for="currency">Currency:</label>
-        <input type="text" id="currency" name="currency" value="rsd"><br>
+        <input type="text" id="currency" name="currency" 
+            value="rsd" list="currencies">
+        <datalist id="currencies">
+            {{range .currencies}}
+            <option value="{{.}}">{{ .}}</option>
+            {{end}}
+        </datalist><br>
 
         <label for="country">Country:</label>
-        <input type="text" id="country" name="country" value="serbia"><br>
+        <input type="text" id="country" name="country"
+            value="serbia" list="countries">
+          <datalist id="countries">
+            {{range .countries}}
+            <option value="{{.}}">{{.}}</option>
+            {{end}}
+          </datalist><br>
 
         <label for="exchangeRate">Exchange Rate:</label>
         <input type="number" step="0.001" id="exchange_rate" name="exchange_rate" value="1"><br>
