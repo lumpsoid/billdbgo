@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="/static/3p/htmx.2.0.0.min.js"></script>
+  <title>Browse bills</title>
+</head>
+
+<body>
+  <div id="content">
+    {{ if .success }}
+    <h2 style="display: inline;">Items {{.year}}-{{.month}}</h2>
+    <a href="{{ call .reverse "browse-bills" .year .month }}">Bills</a>
+    <div>
+      {{ if .nextPage }} <a href="{{ .nextPage }}">Next</a> | {{end}}
+      <a href="{{ .prevPage }}">Previous</a>
+    </div>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>PriceOne</th>
+            <th>Quantity</th>
+            <th>Tag</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ if len .items }}
+          {{ $reverse := .reverse }}
+          {{ range .items }}
+          <tr>
+            <td>{{.Date}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Price}}</td>
+            <td>{{.PriceOne}}</td>
+            <td>{{.Quantity}}</td>
+            <td>{{.Tag}}</td>
+            <td><a href='{{ call $reverse "bill-view" .Id }}'>open</a></td>
+          </tr>
+          {{ end }}
+          {{else}}
+          <tr>
+            <td colspan="7">No items found</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+    {{ else }}
+    <div>
+      <h2>Failed to get items</h2>
+      <p>{{.message}}</p>
+      <a href="{{ .CurrentMonthItemsPage }}">Current month's items</a> |
+    </div>
+    {{ end }}
+  </div>
+  <div>
+    <a href="/">Back to main</a>
+  </div>
+</body>
+
+</html>
