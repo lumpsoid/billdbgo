@@ -60,4 +60,4 @@ jobs:
           file: ./docker/Dockerfile.arm64
           push: true
           platforms: linux/arm64
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-arm64
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
