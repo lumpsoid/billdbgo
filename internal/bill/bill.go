@@ -61,7 +61,7 @@ func (b *Bill) GetDateString() string {
 }
 
 func (b *Bill) GetCurrencyString() string {
-	return currencyToString[b.Currency]
+	return b.Currency.String()
 }
 
 func (b *Bill) GetCountryString() string {
