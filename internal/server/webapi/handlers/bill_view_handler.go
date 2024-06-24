@@ -33,7 +33,7 @@ var (
 				"currency":      bill.GetCurrencyString(),
 				"exchange_rate": bill.ExchangeRate,
 				"country":       bill.GetCountryString(),
-				"tag":           string(bill.Tag),
+				"tag":           bill.Tag.String(),
 				"link":          bill.Link,
 				"bill_text":     bill.BillText,
 				"items":         items,

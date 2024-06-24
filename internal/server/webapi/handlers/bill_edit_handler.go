@@ -41,7 +41,7 @@ var (
 				"currency":      bill.GetCurrencyString(),
 				"exchange_rate": bill.ExchangeRate,
 				"country":       bill.GetCountryString(),
-				"tag":           string(bill.Tag),
+				"tag":           bill.Tag.String(),
 				"link":          bill.Link,
 				"bill_text":     bill.BillText,
 				"currencies":    currencies,
@@ -77,7 +77,7 @@ var (
 			r["cCurrency"] = bill.GetCurrencyString()
 			r["cExchangeRate"] = bill.ExchangeRate
 			r["cCountry"] = bill.GetCountryString()
-			r["cTag"] = string(bill.Tag)
+			r["cTag"] = bill.Tag.String()
 			r["cLink"] = bill.Link
 
 			params, err := c.FormParams()
@@ -119,7 +119,7 @@ var (
 			r["nCurrency"] = bill.GetCurrencyString()
 			r["nExchangeRate"] = bill.ExchangeRate
 			r["nCountry"] = bill.GetCountryString()
-			r["nTag"] = string(bill.Tag)
+			r["nTag"] = bill.Tag.String()
 			r["nLink"] = bill.Link
 
 			c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
