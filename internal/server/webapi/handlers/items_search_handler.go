@@ -33,8 +33,6 @@ var (
 				dates DESC;`
 			q := "%" + c.FormValue("q") + "%"
 
-			c.Logger().Infof("query value: %s", q)
-
 			db := s.BillRepo.GetDb()
 			rows, err := db.Query(queryBase, q, q, q, q, q)
 			if err != nil {

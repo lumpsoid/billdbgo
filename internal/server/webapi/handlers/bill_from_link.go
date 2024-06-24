@@ -54,7 +54,6 @@ var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server)
 			r.Message = fmt.Sprintf("%v\n", err)
 			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
 		}
-		c.Logger().Infof("Dups len: %d\n", len(billsDup))
 		if len(billsDup) != 0 {
 			r.Success = false
 			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", len(billsDup))
