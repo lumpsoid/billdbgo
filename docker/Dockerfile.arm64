@@ -5,7 +5,7 @@ ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
 WORKDIR /billdb
 COPY ./go.mod ./
 COPY ./go.sum ./
-RUN apt-get update -y && apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+RUN apt-get update -y && apt-get install -y build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 RUN go mod download
 
 # Dev environment doesn't run this stage or beyond
