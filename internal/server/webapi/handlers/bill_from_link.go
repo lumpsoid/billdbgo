@@ -78,7 +78,7 @@ var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server)
 		r.Bill = Bill{
 			Id:           bill.GetIdUnix(),
 			Name:         bill.Name,
-			Tag:          string(bill.Tag),
+			Tag:          bill.Tag.String(),
 			Date:         bill.GetDateString(),
 			Price:        bill.Price,
 			Currency:     bill.GetCurrencyString(),
