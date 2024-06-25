@@ -25,4 +25,8 @@ func RegisterWebRoutes(s *server.Server) {
 	h.BillSearchQueary(s)
 	h.ItemsSearch(s).Name = "items-search"
 	h.ItemsSearchQueary(s)
+	h.ItemsTagManagement(s).Name = "items-tag-management"
+	h.ItemTagGet(s).Name = "tag-item-get"
+	h.ItemTagEdit(s).Name = "tag-item-edit"
+	h.ItemTagUpdate(s).Name = "tag-item-update"
 }

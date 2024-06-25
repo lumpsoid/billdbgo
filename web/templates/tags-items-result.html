@@ -1,0 +1,17 @@
+{{ if .Success }}
+<td>{{.Name}}</td>
+<td>{{.Tag}}</td>
+<td>
+  <p style="display: inline;">Previous: {{ .TagPrevious }}</p>
+  <button hx-get="{{call .reverse "tag-item-edit" .Id}}" hx-target="#item-{{.Id}}">
+    Edit</button>
+</td>
+{{else}}
+<td>{{.Name}}</td>
+<td>{{.Tag}}</td>
+<td>
+  <p style="display: inline;">Error: {{ .Message }}</p>
+  <button hx-get="{{call .reverse "tag-item-edit" .Id}}" hx-target="#item-{{.Id}}">
+    Edit</button>
+</td>
+{{end}}

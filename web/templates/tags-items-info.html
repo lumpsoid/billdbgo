@@ -1,0 +1,6 @@
+<td>{{.Name}}</td>
+<td>{{.Tag}}</td>
+<td>
+  <button hx-get="{{call .reverse "tag-item-edit" .Id}}" hx-target="#item-{{.Id}}">
+    Edit</button>
+</td>
