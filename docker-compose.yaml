@@ -2,7 +2,7 @@ services:
   billdb-go:
     build:
       context: .
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./build/docker/Dockerfile
       target: base
     command: go run ./cmd/server/main.go
     ports:
