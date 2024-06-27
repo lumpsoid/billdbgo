@@ -1,0 +1,8 @@
+services:
+  billdb:
+    image: ghcr.io/lumpsoid/billdbgo:latest
+    ports:
+      - "8080:1323" # Change 8080 port to your desired port
+    volumes:
+      - ./bill-data:/server/data # Change ~/bill-data to your desired path, where the database will be stored
+    restart: unless-stopped
