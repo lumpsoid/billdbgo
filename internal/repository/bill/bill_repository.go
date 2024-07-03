@@ -7,17 +7,16 @@ import (
 
 type BillRepository interface {
 	GetDb() *sql.DB
-	CreateTables() error
-	CheckUniqueItemNames() error
-	CheckDuplicateBill(bill *bl.Bill) ([]*bl.Bill, error)
+	ApplyMigration(sqlFilePath string) error
+	CheckDuplicateBill(bill *bl.Bill) (int, error)
 	InsertBill(bill *bl.Bill) error
-	GetBillByID(id int64) (*bl.Bill, error)
+	GetBillByID(id string) (*bl.Bill, error)
 	UpdateBill(bill *bl.Bill) error
-	DeleteBill(id int64) error
+	DeleteBill(id string) error
 	InsertItems(items []*bl.Item) error
-	GetItemsByID(billId int64) ([]*bl.Item, error)
+	GetItemsByID(billId string) ([]*bl.Item, error)
 	UpdateItems(items []*bl.Item) error
-	DeleteItems(billId int64) error
+	DeleteItems(items []*bl.Item) error
 	GetCurrencies() ([]string, error)
 	GetCountries() ([]string, error)
 	GetTags() ([]string, error)

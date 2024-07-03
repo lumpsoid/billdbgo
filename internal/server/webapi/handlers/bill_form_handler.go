@@ -5,13 +5,13 @@ import (
 	"billdb/internal/server"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/segmentio/ksuid"
 )
 
 type Bill struct {
-	Id           int64   `form:"id"`
+	Id           string  `form:"id"`
 	Name         string  `form:"name"`
 	Tag          string  `form:"tag"`
 	Date         string  `form:"date"`
@@ -47,7 +47,7 @@ var (
 			if err != nil {
 				return err
 			}
-			b.Id = time.Now().Local().UnixNano()
+			b.Id = ksuid.New().String()
 
 			billCurrency, err := B.StringToCurrency(b.Currency)
 			if err != nil {
@@ -69,12 +69,11 @@ var (
 			}
 
 			bill := B.BillNew(
-				B.UnixToId(b.Id),
+				b.Id,
 				b.Name,
 				*billDate,
 				b.Price,
 				billCurrency,
-				b.ExchangeRate,
 				billCountry,
 				[]*B.Item{},
 				B.Tag(b.Tag),
@@ -82,16 +81,16 @@ var (
 				"",
 			)
 
-			billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
+			billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
-			if len(billsDup) != 0 {
+			if billDupCount != 0 {
 				r["success"] = false
-				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", len(billsDup))
-				r["dupId"] = billsDup[0].GetIdUnix()
+				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", billDupCount)
+				r["dupId"] = "test"
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 

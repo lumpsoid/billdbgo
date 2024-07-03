@@ -3,9 +3,6 @@ package parser
 import (
 	"billdb/internal/bill"
 	"net/url"
-	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // Parser defines the interface for parsing URLs.
@@ -34,13 +31,4 @@ func GetBillParser(u *url.URL) (Parser, error) {
 		return &ParserSerbia{}, nil
 	}
 	return nil, NewUnimplementedError("No parser available for the given URL")
-}
-
-func DateParse(dateLayout string, dateString string) (*time.Time, error) {
-	dateTime, err := time.Parse(dateLayout, dateString)
-	if err != nil {
-		log.Error("Error parsing date:", err)
-		return nil, err
-	}
-	return &dateTime, nil
 }

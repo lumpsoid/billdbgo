@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/segmentio/ksuid"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
 )
@@ -78,7 +79,7 @@ func queryNode(doc *html.Node, xpath string) (*html.Node, error) {
 
 func fetchItems(
 	doc *html.Node,
-	billId *time.Time,
+	billId *ksuid.KSUID,
 ) ([]*bill.Item, error) {
 	invoceNode, err := queryNode(doc, invoiceXpath)
 	if err != nil {
@@ -136,9 +137,11 @@ func fetchItems(
 	}
 
 	items := make([]*bill.Item, 0)
+	itemId := ksuid.New()
 	for _, item := range rJson.Items {
 		items = append(items, bill.ItemNew(
-			*billId,
+			itemId.String(),
+			billId.String(),
 			item.Name,
 			item.Total,
 			item.UnitPrice,
@@ -146,6 +149,15 @@ func fetchItems(
 		))
 	}
 	return items, nil
+}
+
+func dateParse(dateLayout string, dateString string) (*time.Time, error) {
+	dateTime, err := time.Parse(dateLayout, dateString)
+	if err != nil {
+		log.Error("Error parsing date:", err)
+		return nil, err
+	}
+	return &dateTime, nil
 }
 
 func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
@@ -176,7 +188,7 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 	}
 
 	cleanedDate := cleanWhiteSpace(nodesStrings[buyDateXpath])
-	dateTime, err := DateParse(dateLayout, cleanedDate)
+	dateTime, err := dateParse(dateLayout, cleanedDate)
 	if err != nil {
 		log.WithField("date", nodesStrings[buyDateXpath]).Error(
 			"Error parsing date: ", err)
@@ -200,26 +212,25 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 		log.Error("Error parsing currency string: ", err)
 		return nil, err
 	}
-	tag := bill.Tag("")
+	billId := ksuid.New()
 
-	timestamp := time.Now()
-
-	items, err := fetchItems(doc, &timestamp)
+	items, err := fetchItems(doc, &billId)
 	if err != nil {
 		log.Error("Error fetching items: ", err)
 		return nil, err
 	}
 
 	billObject := bill.BillNew(
-		timestamp,
+		billId.String(),
 		nodesStrings[nameXpath],
 		*dateTime,
 		price,
 		currency,
-		1.0,
+		//TODO exchange system migrate
+		// 1.0,
 		country,
 		items,
-		tag,
+		bill.Tag(""),
 		u.String(),
 		nodesStrings[billXpath],
 	)

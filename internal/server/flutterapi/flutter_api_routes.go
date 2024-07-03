@@ -5,7 +5,7 @@ import "billdb/internal/server"
 const baseApiPath = "/api/flutter"
 
 type BillApi struct {
-	Timestamp    int64   `json:"timestamp"`
+	Id           string  `json:"timestamp"`
 	Name         string  `json:"name"`
 	Date         string  `json:"date"`
 	Price        float64 `json:"price"`

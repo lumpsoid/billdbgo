@@ -1,9 +1,8 @@
 package bill
 
-import "time"
-
 type Item struct {
-	Id       time.Time
+	ItemId   string
+	BillId   string
 	Name     string
 	Price    float64
 	PriceOne float64
@@ -11,21 +10,19 @@ type Item struct {
 }
 
 func ItemNew(
-	id time.Time,
+	itemId string,
+	billId string,
 	name string,
 	price float64,
 	priceOne float64,
 	quantity float64,
 ) *Item {
 	return &Item{
-		Id:       id,
+		ItemId:   itemId,
+		BillId:   billId,
 		Name:     name,
 		Price:    price,
 		PriceOne: priceOne,
 		Quantity: quantity,
 	}
-}
-
-func (t *Item) GetIdUnix() int64 {
-  return t.Id.Local().UnixNano()
 }

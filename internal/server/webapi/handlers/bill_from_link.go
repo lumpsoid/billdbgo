@@ -48,15 +48,15 @@ var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server)
 			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
 		}
 
-		billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
+		billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
 		if err != nil {
 			r.Success = false
 			r.Message = fmt.Sprintf("%v\n", err)
 			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
 		}
-		if len(billsDup) != 0 {
+		if billDupCount != -1 {
 			r.Success = false
-			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", len(billsDup))
+			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", billDupCount)
 			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
 		}
 
@@ -75,14 +75,15 @@ var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server)
 		r.Success = true
 		r.Message = "Bill parsed successfully"
 		r.Bill = Bill{
-			Id:           bill.GetIdUnix(),
-			Name:         bill.Name,
-			Tag:          bill.Tag.String(),
-			Date:         bill.GetDateString(),
-			Price:        bill.Price,
-			Currency:     bill.GetCurrencyString(),
-			ExchangeRate: bill.ExchangeRate,
-			Country:      bill.GetCountryString(),
+			Id:       bill.Id,
+			Name:     bill.Name,
+			Tag:      bill.Tag.String(),
+			Date:     bill.GetDateString(),
+			Price:    bill.Price,
+			Currency: bill.GetCurrencyString(),
+			// TODO exchange rate system
+			// ExchangeRate: bill.ExchangeRate,
+			Country: bill.GetCountryString(),
 		}
 
 		return c.Render(http.StatusOK, "bill-from-link-response.html", r)

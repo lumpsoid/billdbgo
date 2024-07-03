@@ -35,15 +35,22 @@ var (
 			}
 
 			queryBase := `SELECT
-				i.id, i.name, b.dates, i.price, i.price_one, i.quantity, m.tag
+				invoice.invoice_id, 
+				item_name, 
+				invoice_date, 
+				item_price, 
+				item_price_one, 
+				item_quantity, 
+				tag.tag_name
 			FROM
-				items as i
-			LEFT JOIN bills as b ON i.id = b.id
-			LEFT JOIN items_meta as m ON m.name = i.name
+				item
+			LEFT JOIN invoice ON item.invoice_id = invoice.invoice_id
+			LEFT JOIN item_tag ON item_tag.item_id = item.item_id
+			LEFT JOIN tag ON tag.tag_id = item_tag.tag_id
 			WHERE
-				strftime('%%Y-%%m', dates) = '%d-%02d'
+				strftime('%%Y-%%m', invoice_date) = '%d-%02d'
 			ORDER BY
-				dates DESC;`
+				invoice_date DESC;`
 			query := fmt.Sprintf(queryBase, year, month)
 
 			db := s.BillRepo.GetDb()
@@ -57,13 +64,13 @@ var (
 			var itemsResponse []map[string]interface{}
 			for rows.Next() {
 				var (
-					Id       int64
+					Id       string
 					Name     string
 					Date     string
 					Price    float64
 					PriceOne string
 					Quantity float64
-					Tag      string
+					Tag      *string
 				)
 				rows.Scan(&Id, &Name, &Date, &Price, &PriceOne, &Quantity, &Tag)
 				if err != nil {
