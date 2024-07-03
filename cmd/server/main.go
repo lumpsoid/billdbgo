@@ -1,7 +1,7 @@
 package main
 
 import (
-	"billdb/internal/repository"
+	repository "billdb/internal/repository/bill"
 	"billdb/internal/server"
 	flutter "billdb/internal/server/flutterapi"
 	web "billdb/internal/server/webapi"

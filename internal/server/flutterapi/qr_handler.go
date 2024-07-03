@@ -51,27 +51,30 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 		b := BillApi{
-			Timestamp:    bill.GetIdUnix(),
-			Name:         bill.Name,
-			Date:         bill.GetDateString(),
-			Price:        bill.Price,
-			Currency:     bill.GetCurrencyString(),
-			ExchangeRate: bill.ExchangeRate,
-			Country:      bill.GetCountryString(),
-			Items:        len(bill.Items),
-			Link:         req.Link,
+			// TODO check with app, what If I will send string in timestamp
+			Id:       bill.Id,
+			Name:     bill.Name,
+			Date:     bill.GetDateString(),
+			Price:    bill.Price,
+			Currency: bill.GetCurrencyString(),
+			// TODO exchange rate system
+			// ExchangeRate: bill.ExchangeRate,
+			Country: bill.GetCountryString(),
+			Items:   len(bill.Items),
+			Link:    req.Link,
 		}
 		r.Bill = []BillApi{b}
 
-		billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
+		// TODO check in flutter app, do I need to send beck duplicates?
+		billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
 		if err != nil {
 			r.Message = fmt.Sprintf("Duplicates error: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
-		if len(billsDup) != 0 {
+		if billDupCount != 0 {
 			r.Success = "duplicates"
-			b.Duplicates = len(billsDup)
-			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", len(billsDup))
+			b.Duplicates = billDupCount
+			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", billDupCount)
 			return c.JSON(http.StatusOK, r)
 		}
 

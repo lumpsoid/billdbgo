@@ -1,7 +1,7 @@
 package server
 
 import (
-	"billdb/internal/repository"
+	repository "billdb/internal/repository/bill"
 	"fmt"
 	"os"
 

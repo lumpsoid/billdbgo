@@ -4,7 +4,6 @@ import (
 	B "billdb/internal/bill"
 	"billdb/internal/server"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,10 +11,7 @@ import (
 var (
 	BillEditPage = server.Get("/bill/:id/edit", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			billId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-			if err != nil {
-				return err
-			}
+			billId := c.Param("id")
 			bill, err := s.BillRepo.GetBillByID(billId)
 			if err != nil {
 				return err
@@ -28,19 +24,20 @@ var (
 			}
 
 			return c.Render(http.StatusOK, "bill-edit.html", map[string]interface{}{
-				"id":            bill.GetIdUnix(),
-				"date":          bill.GetDateString(),
-				"name":          bill.Name,
-				"price":         bill.Price,
-				"currency":      bill.GetCurrencyString(),
-				"exchange_rate": bill.ExchangeRate,
-				"country":       bill.GetCountryString(),
-				"tag":           bill.Tag.String(),
-				"link":          bill.Link,
-				"bill_text":     bill.BillText,
-				"currencies":    currencies,
-				"countries":     countries,
-				"tags":          tags,
+				"id":       bill.Id,
+				"date":     bill.GetDateString(),
+				"name":     bill.Name,
+				"price":    bill.Price,
+				"currency": bill.GetCurrencyString(),
+				// TODO exchange rate system
+				// "exchange_rate": bill.ExchangeRate,
+				"country":    bill.GetCountryString(),
+				"tag":        bill.Tag.String(),
+				"link":       bill.Link,
+				"bill_text":  bill.BillText,
+				"currencies": currencies,
+				"countries":  countries,
+				"tags":       tags,
 			})
 		}
 	})
@@ -49,27 +46,19 @@ var (
 		return func(c echo.Context) error {
 			r := make(map[string]interface{})
 			r["success"] = false
-			billId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-			if err != nil {
-				c.Logger().Errorf("Error parsing id from url path: %v", err)
-				r["error"] = "Error parsing id from url path"
-				return c.Render(
-					http.StatusOK,
-					"bill-edit-result.html",
-					r,
-				)
-			}
+			billId := c.Param("id")
 			bill, err := s.BillRepo.GetBillByID(billId)
 			if err != nil {
 				c.Logger().Errorf("Error getting bill by id: %v", err)
 				return err
 			}
-			r["id"] = bill.GetIdUnix()
+			r["id"] = bill.Id
 			r["cDate"] = bill.GetDateString()
 			r["cName"] = bill.Name
 			r["cPrice"] = bill.Price
 			r["cCurrency"] = bill.GetCurrencyString()
-			r["cExchangeRate"] = bill.ExchangeRate
+			// TODO exchange rate system
+			// r["cExchangeRate"] = bill.ExchangeRate
 			r["cCountry"] = bill.GetCountryString()
 			r["cTag"] = bill.Tag.String()
 			r["cLink"] = bill.Link
@@ -107,16 +96,22 @@ var (
 					r,
 				)
 			}
-			r["nDate"] = bill.GetDateString()
-			r["nName"] = bill.Name
-			r["nPrice"] = bill.Price
-			r["nCurrency"] = bill.GetCurrencyString()
-			r["nExchangeRate"] = bill.ExchangeRate
-			r["nCountry"] = bill.GetCountryString()
-			r["nTag"] = bill.Tag.String()
-			r["nLink"] = bill.Link
+			billNew, err := s.BillRepo.GetBillByID(billId)
+			if err != nil {
+				c.Logger().Errorf("Error getting bill by id: %v", err)
+				return err
+			}
+			r["nDate"] = billNew.GetDateString()
+			r["nName"] = billNew.Name
+			r["nPrice"] = billNew.Price
+			r["nCurrency"] = billNew.GetCurrencyString()
+			// TODO exchange rate system
+			// r["nExchangeRate"] = bill.ExchangeRate
+			r["nCountry"] = billNew.GetCountryString()
+			r["nTag"] = billNew.Tag.String()
+			r["nLink"] = billNew.Link
 
-			c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+			// c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 			r["success"] = true
 			return c.Render(
 				http.StatusOK,

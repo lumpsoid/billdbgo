@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/segmentio/ksuid"
 )
 
 const urlLink = `https://suf.purs.gov.rs:443/v/?vl=A1U2RVVRSDhUVTZFVVFIOFSmvAQAJ7oEAMRvQQMAAAAAAAABi8nEtiwAAACJEXBZdZJy/NmApRiEns0Sgulz4SpsZpL0dvJtAbJh7IOyoE6pEx+1qDfy59VX5fVpHsJwdGLNUg1a0R/y4+mVo85QwP7TNH4N/yzwrv6nrn1/m+rApP1xaGvy8K11wId0HqIuNIWi5XYQa3ah7fJ+LDi2Hyi/o5/SqDCYN58Hz2VnD4uTg+kmhnTSV6YjFtFRykSBoXx7mKh4SEj352l7r076EAtrrJmdqWFYpcY6qYCzxvwXicNpFnZOHrkuvxYqw86ktSB/nvTRvVGNDPkFmCEMe73K6NArhrajz0pPjsHECoT5FcX1ziqxwRPsv4k0ef1leofQ3djA+Wi3/dIrFixHLL7GbFV1l4r8giajLYOxBEdx0px1MIXuyperIu2OEJrjCiK5QpciFq1Payd1vggQnD7ccsbDXfNuG6r9JekuZvF6XGpgGqL+c9duSOpdW0Rrr+SX1RFmHLhOsFeu38HEVvSckjGaXUmC74bflQ0ggCl2fbic3tWUlfKT6gy3NATDpm7/hU/D2ljOJgu87bP6r7evdhLse9fnUn4DLwVioi32xKnOopaEVQZ508DgNEPCVOppgSXM93cHUOA2HGqzgFL+bR+cV4PmPdgeHWvPpyoHb9QPJZwUZcTHm3v17dR/5gbeKeLoMiSsfXsDrYfl9oYdF6Ml+p4pbyouh7T2pV3zexxL8OWcOlfoGJs=`
@@ -100,9 +101,9 @@ func TestFetchItems(t *testing.T) {
 		t.Errorf("Failed to load URL: %v", err)
 		return
 	}
-	timestamp := time.Now()
 
-	items, err := fetchItems(doc, &timestamp)
+	billId := ksuid.New()
+	items, err := fetchItems(doc, &billId)
 	if err != nil {
 		t.Errorf("Failed to fetch items: %v", err)
 		return
@@ -145,14 +146,14 @@ func TestBisareItemFetch(t *testing.T) {
 			return
 		}
 
-		time := time.Now()
 		doc, err := htmlquery.LoadURL(u.String())
 		if err != nil {
 			t.Error("Error loading URL: ", err)
 			return
 		}
 
-		items, err := fetchItems(doc, &time)
+		billId := ksuid.New()
+		items, err := fetchItems(doc, &billId)
 		if err != nil {
 			t.Errorf("Failed to fetch items: %v", err)
 			return
@@ -195,8 +196,8 @@ func TestParserSerbia_Parse(t *testing.T) {
 	if billObject.Name != billName {
 		t.Errorf("Expected %s, got %s", billName, billObject.Name)
 	}
-	if billObject.Id.IsZero() {
-		t.Errorf("Expected non-zero bill ID")
+	if billObject.Id == "" {
+		t.Errorf("Expected non-empty bill ID")
 	}
 	if billObject.Date.IsZero() {
 		t.Errorf("Expected non-zero bill date")

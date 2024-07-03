@@ -7,26 +7,24 @@ import (
 )
 
 type Bill struct {
-	Id           time.Time
-	Name         string
-	Date         time.Time
-	Price        float64
-	Currency     Currency
-	ExchangeRate float64
-	Country      Country
-	Items        []*Item
-	Tag          Tag
-	Link         string
-	BillText     string
+	Id       string
+	Name     string
+	Date     time.Time
+	Price    float64
+	Currency Currency
+	Country  Country
+	Items    []*Item
+	Tag      Tag // TODO add posibility to be nil
+	Link     string
+	BillText string // TODO transform into a struct
 }
 
 func BillNew(
-	id time.Time,
+	id string,
 	name string,
 	date time.Time,
 	price float64,
 	currency Currency,
-	exchangeRate float64,
 	country Country,
 	items []*Item,
 	tag Tag,
@@ -34,26 +32,21 @@ func BillNew(
 	billText string,
 ) *Bill {
 	return &Bill{
-		Id:           id,
-		Name:         name,
-		Date:         date,
-		Price:        price,
-		Currency:     currency,
-		ExchangeRate: exchangeRate,
-		Country:      country,
-		Items:        items,
-		Tag:          tag,
-		Link:         link,
-		BillText:     billText,
+		Id:       id,
+		Name:     name,
+		Date:     date,
+		Price:    price,
+		Currency: currency,
+		Country:  country,
+		Items:    items,
+		Tag:      tag,
+		Link:     link,
+		BillText: billText,
 	}
 }
 
 func (b *Bill) AddItem(item *Item) {
 	b.Items = append(b.Items, item)
-}
-
-func (b *Bill) GetIdUnix() int64 {
-	return b.Id.Local().UnixNano()
 }
 
 func (b *Bill) GetDateString() string {
@@ -91,11 +84,12 @@ func UpdateBillProperty(bill *Bill, property string, value interface{}) error {
 		}
 		bill.Currency = currencyNew
 	case "exchange_rate":
-		exchangeRateNew, err := strconv.ParseFloat(value.(string), 64)
-		if err != nil {
-			return err
-		}
-		bill.ExchangeRate = exchangeRateNew
+		// TODO migrate exchange rate system
+		// exchangeRateNew, err := strconv.ParseFloat(value.(string), 64)
+		// if err != nil {
+		// return err
+		// }
+		// bill.ExchangeRate = exchangeRateNew
 	case "country":
 		countryNew, err := StringToCountry(value.(string))
 		if err != nil {

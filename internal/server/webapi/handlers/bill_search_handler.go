@@ -20,17 +20,26 @@ var (
 			r["success"] = false
 
 			queryBase := `SELECT
-				id, name, dates, price, currency, country, tag
+				invoice.invoice_id, 
+				invoice_name, 
+				invoice_date, 
+				invoice_price, 
+				invoice_currency, 
+				invoice_country,
+				tag.tag_name
 			FROM
-				bills
+				invoice
+			LEFT JOIN invoice_tag ON invoice_tag.invoice_id = invoice.invoice_id
+			LEFT JOIN tag ON tag.tag_id = invoice_tag.tag_id
 			WHERE
-				name LIKE ?
-				OR tag LIKE ?
-				OR dates LIKE ?
-				OR currency LIKE ?
-				OR country LIKE ?
+					invoice_name LIKE ?
+					OR tag.tag_name LIKE ?
+					OR invoice_date LIKE ?
+					OR invoice_currency LIKE ?
+					OR invoice_country LIKE ?
 			ORDER BY
-				dates DESC;`
+				invoice_date DESC;`
+
 			q := "%" + c.FormValue("q") + "%"
 
 			db := s.BillRepo.GetDb()
@@ -44,7 +53,7 @@ var (
 			var result []Bill
 			for rows.Next() {
 				var (
-					Id       int64
+					Id       string
 					Name     string
 					Date     string
 					Price    float64
@@ -58,11 +67,12 @@ var (
 					return c.Render(http.StatusOK, "search-bills-result.html", r)
 				}
 				result = append(result, Bill{
-					Id:           Id,
-					Name:         Name,
-					Date:         Date,
-					Price:        Price,
-					Currency:     Currency,
+					Id:       Id,
+					Name:     Name,
+					Date:     Date,
+					Price:    Price,
+					Currency: Currency,
+					// TODO exchange rate system
 					ExchangeRate: 0,
 					Country:      Country,
 					Tag:          Tag,

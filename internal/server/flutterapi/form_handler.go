@@ -5,9 +5,9 @@ import (
 	"billdb/internal/server"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/segmentio/ksuid"
 )
 
 type RequestForm struct {
@@ -51,13 +51,13 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			return c.JSON(http.StatusBadRequest, r)
 		}
 
+		billId := ksuid.New()
 		bill := B.BillNew(
-			time.Now().Local(),
+			billId.String(),
 			req.Name,
 			*billDate,
 			req.Price,
 			billCurrency,
-			req.ExchangeRate,
 			billCountry,
 			[]*B.Item{},
 			B.Tag(req.Tags),
@@ -65,7 +65,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			"",
 		)
 		billApi := BillApi{
-			Timestamp:    bill.GetIdUnix(),
+			Id:           bill.Id,
 			Name:         req.Name,
 			Date:         bill.GetDateString(),
 			Price:        req.Price,
@@ -77,15 +77,15 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			Duplicates:   0,
 		}
 
-		billsDup, err := s.BillRepo.CheckDuplicateBill(bill)
+		billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
-		if len(billsDup) != 0 {
+		if billDupCount != 0 {
 			r.Success = "duplicates"
-			billApi.Duplicates = len(billsDup)
-			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", len(billsDup))
+			billApi.Duplicates = billDupCount
+			r.Message = fmt.Sprintf("Find duplicates in the db = %d\n", billDupCount)
 			return c.JSON(http.StatusOK, r)
 		}
 

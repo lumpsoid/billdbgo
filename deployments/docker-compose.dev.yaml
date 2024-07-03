@@ -1,7 +1,7 @@
 services:
   billdb-go:
     build:
-      context: .
+      context: ..
       dockerfile: ./build/docker/Dockerfile
       target: base
     command: go run ./cmd/server/main.go
@@ -10,10 +10,10 @@ services:
     environment:
       - BILLDB_DB_PATH=/billdb/data/bills.db
     volumes:
-      - ../billdb-docker-test/data:/billdb/data
-      - ./web/templates:/billdb/templates
-      - ./web/static:/billdb/static
-      - ./cmd:/billdb/cmd
-      - ./internal/:/billdb/internal
+      - ../../billdb-docker-test/data:/billdb/data
+      - ../web/templates:/billdb/templates
+      - ../web/static:/billdb/static
+      - ../cmd:/billdb/cmd
+      - ../internal/:/billdb/internal
     restart: unless-stopped
 

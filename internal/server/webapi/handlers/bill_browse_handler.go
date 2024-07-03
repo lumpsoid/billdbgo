@@ -41,22 +41,28 @@ var (
 				return c.Render(http.StatusOK, "browse-bills.html", r)
 			}
 
-			queryBase := `
-      SELECT
-				id, name, dates, price, currency, exchange_rate, country, tag
+			queryBase := `SELECT
+				invoice.invoice_id, 
+				invoice_name, 
+				invoice_date, 
+				invoice_price, 
+				invoice_currency, 
+				invoice_country,
+				tag.tag_name
 			FROM
-				bills
+				invoice
+			LEFT JOIN invoice_tag ON invoice_tag.invoice_id = invoice.invoice_id
+			LEFT JOIN tag ON tag.tag_id = invoice_tag.tag_id
 			WHERE
-				strftime('%%Y-%%m', dates) = '%d-%02d'
+				strftime('%%Y-%%m', invoice_date) = '%d-%02d'
 			ORDER BY
-				dates DESC;
-      `
+				invoice_date DESC;`
 			query := fmt.Sprintf(queryBase, year, month)
 
 			db := s.BillRepo.GetDb()
 			rows, err := db.Query(query)
 			if err != nil {
-				r["message"] = "Error while querying the database"
+				r["message"] = fmt.Sprintf("Error while querying the database: %v", err)
 				return c.Render(http.StatusOK, "browse-bills.html", r)
 			}
 			defer rows.Close()
@@ -64,27 +70,27 @@ var (
 			var billsResponse []Bill
 			for rows.Next() {
 				var (
-					Id           int64
-					Name         string
-					Date         string
-					Price        float64
-					Currency     string
-					ExchangeRate float64
-					Country      string
-					Tag          string
+					Id       string
+					Name     string
+					Date     string
+					Price    float64
+					Currency string
+					Country  string
+					Tag      string
 				)
-				rows.Scan(&Id, &Name, &Date, &Price, &Currency, &ExchangeRate, &Country, &Tag)
+				rows.Scan(&Id, &Name, &Date, &Price, &Currency, &Country, &Tag)
 				if err != nil {
 					r["message"] = "Error while scanning the database"
 					return c.Render(http.StatusOK, "browse-bills.html", r)
 				}
 				billsResponse = append(billsResponse, Bill{
-					Id:           Id,
-					Name:         Name,
-					Date:         Date,
-					Price:        Price,
-					Currency:     Currency,
-					ExchangeRate: ExchangeRate,
+					Id:       Id,
+					Name:     Name,
+					Date:     Date,
+					Price:    Price,
+					Currency: Currency,
+					// TODO echange rate
+					ExchangeRate: 0,
 					Country:      Country,
 					Tag:          Tag,
 				})

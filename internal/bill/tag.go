@@ -6,6 +6,13 @@ import (
 
 type Tag string
 
+func TagNew(tag *string) Tag {
+	if tag == nil {
+		return Tag("")
+	}
+	return Tag(*tag)
+}
+
 func (t Tag) String() string {
 	return string(t)
 }
