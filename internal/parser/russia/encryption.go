@@ -1,4 +1,4 @@
-package parser
+package russia
 
 import (
 	"crypto/aes"
@@ -9,12 +9,8 @@ import (
 
 func getPasswordHash(password string) ([]byte, error) {
 	passwordBytes := []byte(password)
-
-	hasher := sha256.New()
-	hasher.Write(passwordBytes)
-	hash := hasher.Sum(nil)
-
-	return hash, nil
+	hash := sha256.Sum256(passwordBytes)
+	return hash[:], nil
 }
 
 func decrypt(cyphertext []byte, key []byte) ([]byte, error) {
