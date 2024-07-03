@@ -1,4 +1,4 @@
-package bill
+package tag
 
 import (
 	"regexp"
@@ -6,7 +6,7 @@ import (
 
 type Tag string
 
-func TagNew(tag *string) Tag {
+func New(tag *string) Tag {
 	if tag == nil {
 		return Tag("")
 	}

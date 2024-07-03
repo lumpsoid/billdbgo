@@ -1,7 +1,9 @@
 package handlers
 
 import (
-	B "billdb/internal/bill"
+	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
 	"billdb/internal/server"
 	"net/http"
 
@@ -12,29 +14,29 @@ var (
 	BillEditPage = server.Get("/bill/:id/edit", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			billId := c.Param("id")
-			bill, err := s.BillRepo.GetBillByID(billId)
+			billRequested, err := s.BillRepo.GetBillByID(billId)
 			if err != nil {
 				return err
 			}
-			currencies := B.GetCurrencyList()
-			countries := B.GetCountryList()
+			currencies := currency.Available()
+			countries := country.Available()
 			tags, err := s.BillRepo.GetTags()
 			if err != nil {
 				return err
 			}
 
 			return c.Render(http.StatusOK, "bill-edit.html", map[string]interface{}{
-				"id":       bill.Id,
-				"date":     bill.GetDateString(),
-				"name":     bill.Name,
-				"price":    bill.Price,
-				"currency": bill.GetCurrencyString(),
+				"id":       billRequested.Id,
+				"date":     billRequested.GetDateString(),
+				"name":     billRequested.Name,
+				"price":    billRequested.Price,
+				"currency": billRequested.GetCurrencyString(),
 				// TODO exchange rate system
 				// "exchange_rate": bill.ExchangeRate,
-				"country":    bill.GetCountryString(),
-				"tag":        bill.Tag.String(),
-				"link":       bill.Link,
-				"bill_text":  bill.BillText,
+				"country":    billRequested.GetCountryString(),
+				"tag":        billRequested.Tag.String(),
+				"link":       billRequested.Link,
+				"bill_text":  billRequested.BillText,
 				"currencies": currencies,
 				"countries":  countries,
 				"tags":       tags,
@@ -47,21 +49,21 @@ var (
 			r := make(map[string]interface{})
 			r["success"] = false
 			billId := c.Param("id")
-			bill, err := s.BillRepo.GetBillByID(billId)
+			billEdited, err := s.BillRepo.GetBillByID(billId)
 			if err != nil {
 				c.Logger().Errorf("Error getting bill by id: %v", err)
 				return err
 			}
-			r["id"] = bill.Id
-			r["cDate"] = bill.GetDateString()
-			r["cName"] = bill.Name
-			r["cPrice"] = bill.Price
-			r["cCurrency"] = bill.GetCurrencyString()
+			r["id"] = billEdited.Id
+			r["cDate"] = billEdited.GetDateString()
+			r["cName"] = billEdited.Name
+			r["cPrice"] = billEdited.Price
+			r["cCurrency"] = billEdited.GetCurrencyString()
 			// TODO exchange rate system
 			// r["cExchangeRate"] = bill.ExchangeRate
-			r["cCountry"] = bill.GetCountryString()
-			r["cTag"] = bill.Tag.String()
-			r["cLink"] = bill.Link
+			r["cCountry"] = billEdited.GetCountryString()
+			r["cTag"] = billEdited.Tag.String()
+			r["cLink"] = billEdited.Link
 
 			params, err := c.FormParams()
 			if err != nil {
@@ -75,7 +77,7 @@ var (
 				if value[0] == "" {
 					continue
 				}
-				err := B.UpdateBillProperty(bill, property, value[0])
+				err := bill.UpdateBillProperty(billEdited, property, value[0])
 				if err != nil {
 					c.Logger().Errorf("Error wile updating bill property: %v", err)
 					r["error"] = err
@@ -86,7 +88,7 @@ var (
 					)
 				}
 			}
-			err = s.BillRepo.UpdateBill(bill)
+			err = s.BillRepo.UpdateBill(billEdited)
 			if err != nil {
 				c.Logger().Errorf("Error updating bill: %v", err)
 				r["error"] = "Error updating bill in db."

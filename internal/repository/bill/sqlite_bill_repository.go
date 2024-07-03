@@ -2,6 +2,10 @@ package repository
 
 import (
 	bl "billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"database/sql"
 	"fmt"
 	"os"
@@ -224,7 +228,7 @@ func (r *SqliteBillRepository) DeleteBill(id string) error {
 }
 
 // Implementation for checking unique item names
-func (r *SqliteBillRepository) InsertItems(items []*bl.Item) error {
+func (r *SqliteBillRepository) InsertItems(items []*item.Item) error {
 	stmt, err := r.DB.Prepare(
 		"INSERT INTO item ( item_id, invoice_id, item_name, item_price, item_price_one, item_quantity) VALUES (?,?,?,?,?,?)")
 	if err != nil {
@@ -250,7 +254,7 @@ func (r *SqliteBillRepository) InsertItems(items []*bl.Item) error {
 }
 
 // Implementation for getting an item from the database by ID
-func (r *SqliteBillRepository) GetItemsByID(billId string) ([]*bl.Item, error) {
+func (r *SqliteBillRepository) GetItemsByID(billId string) ([]*item.Item, error) {
 	rows, err := r.DB.Query(`SELECT
 			item_id, 
 			invoice_id, 
@@ -267,7 +271,7 @@ func (r *SqliteBillRepository) GetItemsByID(billId string) ([]*bl.Item, error) {
 	}
 	defer rows.Close()
 
-	var items []*bl.Item
+	var items []*item.Item
 	for rows.Next() {
 		var (
 			itemId   string
@@ -288,7 +292,7 @@ func (r *SqliteBillRepository) GetItemsByID(billId string) ([]*bl.Item, error) {
 		if err != nil {
 			return nil, err
 		}
-		item := bl.ItemNew(
+		it := item.New(
 			itemId,
 			billId,
 			name,
@@ -296,23 +300,23 @@ func (r *SqliteBillRepository) GetItemsByID(billId string) ([]*bl.Item, error) {
 			priceOne,
 			quantity,
 		)
-		items = append(items, item)
+		items = append(items, it)
 	}
 
 	return items, nil
 }
 
-func (r *SqliteBillRepository) UpdateItems(items []*bl.Item) error {
+func (r *SqliteBillRepository) UpdateItems(items []*item.Item) error {
 	return fmt.Errorf("not implemented")
 }
 
 // Implementation for updating an item in the database
-func (r *SqliteBillRepository) UpdateItem(item *bl.Item) error {
+func (r *SqliteBillRepository) UpdateItem(item *item.Item) error {
 	return fmt.Errorf("not implemented")
 }
 
 // Implementation for deleting an item from the database by ID
-func (r *SqliteBillRepository) DeleteItems(items []*bl.Item) error {
+func (r *SqliteBillRepository) DeleteItems(items []*item.Item) error {
 	tx, err := r.DB.Begin()
 	if err != nil {
 		return err
@@ -518,16 +522,16 @@ func ScanToBill(row interface{}) (*bl.Bill, error) {
 	if err != nil {
 		return nil, err
 	}
-	billCurrency, err := bl.StringToCurrency(Currency)
+	billCurrency, err := currency.Parse(Currency)
 	if err != nil {
 		return nil, err
 	}
-	billCountry, err := bl.StringToCountry(Country)
+	billCountry, err := country.Parse(Country)
 	if err != nil {
 		return nil, err
 	}
 
-	bill := bl.BillNew(
+	bill := bl.New(
 		Id,
 		Name,
 		*billDate,
@@ -536,8 +540,8 @@ func ScanToBill(row interface{}) (*bl.Bill, error) {
 		// TODO exchange rate system
 		// ExchangeRate,
 		billCountry,
-		[]*bl.Item{},
-		bl.TagNew(Tag),
+		[]*item.Item{},
+		tag.New(Tag),
 		Link,
 		"",
 	)

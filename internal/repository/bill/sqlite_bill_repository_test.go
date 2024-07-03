@@ -2,6 +2,9 @@ package repository
 
 import (
 	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
 	"database/sql"
 	"fmt"
 	"os"
@@ -119,14 +122,14 @@ func TestInsertBill(t *testing.T) {
 
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
@@ -222,14 +225,14 @@ func TestGetBillById(t *testing.T) {
 
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
@@ -300,38 +303,38 @@ func TestUpdateBill(t *testing.T) {
 		return
 	}
 	bills := []*bill.Bill{
-		bill.BillNew(
+		bill.New(
 			id.String(),
 			"Test bill",
 			date,
 			100.0,
-			bill.RSD,
-			bill.RUSSIA,
-			[]*bill.Item{},
+			currency.RSD,
+			country.RUSSIA,
+			[]*item.Item{},
 			"",
 			"linkString",
 			"billText",
 		),
-		bill.BillNew(
+		bill.New(
 			id.String(),
 			"Test bill NEW",
 			dateNew,
 			999.0,
-			bill.EUR,
-			bill.SERBIA,
-			[]*bill.Item{},
+			currency.EUR,
+			country.SERBIA,
+			[]*item.Item{},
 			"tag1,tag2,NEW",
 			"linkStringNEW",
 			"billTextNEW",
 		),
-		bill.BillNew(
+		bill.New(
 			id.String(),
 			"Test bill NEW",
 			dateNew,
 			999.0,
-			bill.EUR,
-			bill.SERBIA,
-			[]*bill.Item{},
+			currency.EUR,
+			country.SERBIA,
+			[]*item.Item{},
 			"",
 			"linkStringNEW",
 			"billTextNEW",
@@ -437,14 +440,14 @@ func TestDeleteBill(t *testing.T) {
 
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
@@ -509,14 +512,14 @@ func TestCheckDuplicateBill(t *testing.T) {
 
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
@@ -555,14 +558,14 @@ func TestScanToBill(t *testing.T) {
 	}
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
@@ -633,22 +636,22 @@ func TestInsertItems(t *testing.T) {
 	}
 	date := time.Now()
 	id := ksuid.New()
-	b := bill.BillNew(
+	b := bill.New(
 		id.String(),
 		"Test bill",
 		date,
 		100.0,
-		bill.RSD,
-		bill.RUSSIA,
-		[]*bill.Item{},
+		currency.RSD,
+		country.RUSSIA,
+		[]*item.Item{},
 		"tag1,tag2",
 		"linkString",
 		"billText",
 	)
 
 	itemId := ksuid.New()
-	var items []*bill.Item
-	item := bill.ItemNew(
+	var items []*item.Item
+	itemN := item.New(
 		itemId.String(),
 		id.String(),
 		"item1",
@@ -656,7 +659,7 @@ func TestInsertItems(t *testing.T) {
 		100.0,
 		1.0,
 	)
-	items = append(items, item)
+	items = append(items, itemN)
 	err = billRepo.InsertItems(items)
 	if err != nil {
 		t.Errorf("Failed to insert items: %v", err)
@@ -690,23 +693,23 @@ func TestInsertItems(t *testing.T) {
 			t.Errorf("Failed to scan row: %v", err)
 			return
 		}
-		if itemId != item.ItemId {
-			t.Errorf("Expected ID: '%s', got: %s", item.ItemId, itemId)
+		if itemId != itemN.ItemId {
+			t.Errorf("Expected ID: '%s', got: %s", itemN.ItemId, itemId)
 		}
-		if billId != item.BillId {
-			t.Errorf("Expected ID: '%s', got: %s", item.BillId, billId)
+		if billId != itemN.BillId {
+			t.Errorf("Expected ID: '%s', got: %s", itemN.BillId, billId)
 		}
-		if name != item.Name {
-			t.Errorf("Expected Name '%s', got %s", item.Name, name)
+		if name != itemN.Name {
+			t.Errorf("Expected Name '%s', got %s", itemN.Name, name)
 		}
-		if price != item.Price {
-			t.Errorf("Expected Price '%f', got %f", item.Price, price)
+		if price != itemN.Price {
+			t.Errorf("Expected Price '%f', got %f", itemN.Price, price)
 		}
-		if priceOne != item.PriceOne {
-			t.Errorf("Expected PriceOne '%f', got %f", item.PriceOne, priceOne)
+		if priceOne != itemN.PriceOne {
+			t.Errorf("Expected PriceOne '%f', got %f", itemN.PriceOne, priceOne)
 		}
-		if quantity != item.Quantity {
-			t.Errorf("Expected Quantity '%f', got %f", item.Quantity, quantity)
+		if quantity != itemN.Quantity {
+			t.Errorf("Expected Quantity '%f', got %f", itemN.Quantity, quantity)
 		}
 	}
 }
@@ -726,7 +729,7 @@ func TestGetItemsByID(t *testing.T) {
 	}
 	id := ksuid.New()
 	itemId1 := ksuid.New()
-	item := bill.ItemNew(
+	itemN := item.New(
 		itemId1.String(),
 		id.String(),
 		"item1",
@@ -735,7 +738,7 @@ func TestGetItemsByID(t *testing.T) {
 		1.0,
 	)
 	itemId2 := ksuid.New()
-	item2 := bill.ItemNew(
+	item2 := item.New(
 		itemId2.String(),
 		id.String(),
 		"item2",
@@ -743,8 +746,8 @@ func TestGetItemsByID(t *testing.T) {
 		102.0,
 		2.0,
 	)
-	err = billRepo.InsertItems([]*bill.Item{
-		item,
+	err = billRepo.InsertItems([]*item.Item{
+		itemN,
 		item2,
 	})
 	if err != nil {
@@ -752,7 +755,7 @@ func TestGetItemsByID(t *testing.T) {
 		return
 	}
 
-	itemsByID, err := billRepo.GetItemsByID(item.BillId)
+	itemsByID, err := billRepo.GetItemsByID(itemN.BillId)
 	if err != nil {
 		t.Errorf("Failed to get items by ID: %v", err)
 		return
@@ -762,11 +765,11 @@ func TestGetItemsByID(t *testing.T) {
 		t.Errorf("Expected 2 item, got %d", len(itemsByID))
 		return
 	}
-	if itemsByID[0].BillId != item.BillId {
-		t.Errorf("Expected ID '%s', got %s", item.BillId, itemsByID[0].BillId)
+	if itemsByID[0].BillId != itemN.BillId {
+		t.Errorf("Expected ID '%s', got %s", itemN.BillId, itemsByID[0].BillId)
 	}
-	if itemsByID[0].Name != item.Name {
-		t.Errorf("Expected Name '%s', got %s", item.Name, itemsByID[0].Name)
+	if itemsByID[0].Name != itemN.Name {
+		t.Errorf("Expected Name '%s', got %s", itemN.Name, itemsByID[0].Name)
 	}
 	if itemsByID[1].ItemId != item2.ItemId {
 		t.Errorf("Expected Price '%f', got %f", item2.Price, itemsByID[1].Price)
@@ -794,8 +797,8 @@ func TestDeleteItems(t *testing.T) {
 	}
 	id := ksuid.New()
 	itemId1 := ksuid.New()
-	var items []*bill.Item
-	item := bill.ItemNew(
+	var items []*item.Item
+	itemN := item.New(
 		itemId1.String(),
 		id.String(),
 		"item1",
@@ -804,7 +807,7 @@ func TestDeleteItems(t *testing.T) {
 		1.0,
 	)
 	itemId2 := ksuid.New()
-	item2 := bill.ItemNew(
+	item2 := item.New(
 		itemId2.String(),
 		id.String(),
 		"item2",
@@ -812,7 +815,7 @@ func TestDeleteItems(t *testing.T) {
 		102.0,
 		2.0,
 	)
-	items = append(items, item, item2)
+	items = append(items, itemN, item2)
 	err = billRepo.InsertItems(items)
 	if err != nil {
 		t.Errorf("Failed to insert items: %v", err)
@@ -825,7 +828,7 @@ func TestDeleteItems(t *testing.T) {
 		return
 	}
 
-	itemsFromDb, err := billRepo.GetItemsByID(item.BillId)
+	itemsFromDb, err := billRepo.GetItemsByID(itemN.BillId)
 	if err != nil {
 		t.Errorf("Failed to get items by ID: %v", err)
 		return
@@ -839,7 +842,7 @@ func TestDeleteItems(t *testing.T) {
 	rows, err := billRepo.DB.Query(`SELECT item_id
 		FROM item_tag 
 		WHERE item_id = ?`,
-		item.ItemId,
+		itemN.ItemId,
 	)
 	if err != nil {
 		t.Errorf("Failed to query database: %v", err)

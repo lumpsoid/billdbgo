@@ -1,7 +1,7 @@
 package russia
 
 import (
-	B "billdb/internal/bill"
+	"billdb/internal/bill"
 	"time"
 )
 
@@ -65,7 +65,7 @@ func (b *BillJson) TransactionTime() (*time.Time, error) {
 	return &time, nil
 }
 
-func (b *BillJson) toBill() (*B.Bill, error) {
+func (b *BillJson) toBill() (*bill.Bill, error) {
 	// timeNow := time.Now()
 	// timeTransaction, err := b.TransactionTime()
 	// if err != nil {
@@ -79,5 +79,5 @@ func (b *BillJson) toBill() (*B.Bill, error) {
 	// 	b.OverallPrice(),
 	// 	B.RUB,
 	// )
-	return &B.Bill{}, nil
+	return &bill.Bill{}, nil
 }

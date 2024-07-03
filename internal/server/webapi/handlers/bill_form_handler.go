@@ -1,7 +1,11 @@
 package handlers
 
 import (
-	B "billdb/internal/bill"
+	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"billdb/internal/server"
 	"fmt"
 	"net/http"
@@ -24,8 +28,8 @@ type Bill struct {
 var (
 	BillFormPage = server.Get("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			currencies := B.GetCurrencyList()
-			countries := B.GetCountryList()
+			currencies := currency.Available()
+			countries := country.Available()
 			tags, err := s.BillRepo.GetTags()
 			if err != nil {
 				return err
@@ -49,39 +53,39 @@ var (
 			}
 			b.Id = ksuid.New().String()
 
-			billCurrency, err := B.StringToCurrency(b.Currency)
+			billCurrency, err := currency.Parse(b.Currency)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
-			billCountry, err := B.StringToCountry(b.Country)
+			billCountry, err := country.Parse(b.Country)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
-			billDate, err := B.StringToDate(b.Date)
+			billDate, err := bill.StringToDate(b.Date)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 
-			bill := B.BillNew(
+			billNew := bill.New(
 				b.Id,
 				b.Name,
 				*billDate,
 				b.Price,
 				billCurrency,
 				billCountry,
-				[]*B.Item{},
-				B.Tag(b.Tag),
+				[]*item.Item{},
+				tag.Tag(b.Tag),
 				"",
 				"",
 			)
 
-			billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
+			billDupCount, err := s.BillRepo.CheckDuplicateBill(billNew)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
@@ -94,7 +98,7 @@ var (
 				return c.Render(http.StatusOK, "bill-form-response.html", r)
 			}
 
-			err = s.BillRepo.InsertBill(bill)
+			err = s.BillRepo.InsertBill(billNew)
 			if err != nil {
 				r["success"] = false
 				r["message"] = "Error while inserting bill to db"

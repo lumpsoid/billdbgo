@@ -1,6 +1,10 @@
 package bill
 
 import (
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"strconv"
 	"strings"
 	"time"
@@ -11,23 +15,23 @@ type Bill struct {
 	Name     string
 	Date     time.Time
 	Price    float64
-	Currency Currency
-	Country  Country
-	Items    []*Item
-	Tag      Tag // TODO add posibility to be nil
+	Currency currency.Currency
+	Country  country.Country
+	Items    []*item.Item
+	Tag      tag.Tag // TODO add posibility to be nil
 	Link     string
 	BillText string // TODO transform into a struct
 }
 
-func BillNew(
+func New(
 	id string,
 	name string,
 	date time.Time,
 	price float64,
-	currency Currency,
-	country Country,
-	items []*Item,
-	tag Tag,
+	currency currency.Currency,
+	country country.Country,
+	items []*item.Item,
+	tag tag.Tag,
 	link string,
 	billText string,
 ) *Bill {
@@ -45,7 +49,7 @@ func BillNew(
 	}
 }
 
-func (b *Bill) AddItem(item *Item) {
+func (b *Bill) AddItem(item *item.Item) {
 	b.Items = append(b.Items, item)
 }
 
@@ -78,7 +82,7 @@ func UpdateBillProperty(bill *Bill, property string, value interface{}) error {
 		}
 		bill.Price = priceNew
 	case "currency":
-		currencyNew, err := StringToCurrency(value.(string))
+		currencyNew, err := currency.Parse(value.(string))
 		if err != nil {
 			return err
 		}
@@ -91,13 +95,13 @@ func UpdateBillProperty(bill *Bill, property string, value interface{}) error {
 		// }
 		// bill.ExchangeRate = exchangeRateNew
 	case "country":
-		countryNew, err := StringToCountry(value.(string))
+		countryNew, err := country.Parse(value.(string))
 		if err != nil {
 			return err
 		}
 		bill.Country = countryNew
 	case "tag":
-		bill.Tag = Tag(value.(string))
+		bill.Tag = tag.Tag(value.(string))
 	case "link":
 		bill.Link = value.(string)
 	}

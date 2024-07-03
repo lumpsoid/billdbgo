@@ -1,7 +1,11 @@
 package flutterapi
 
 import (
-	B "billdb/internal/bill"
+	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"billdb/internal/server"
 	"fmt"
 	"net/http"
@@ -35,39 +39,39 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			return c.JSON(http.StatusBadRequest, err)
 		}
 		r.Force = req.Force
-		billDate, err := B.StringToDate(req.Date)
+		billDate, err := bill.StringToDate(req.Date)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusBadRequest, r)
 		}
-		billCountry, err := B.StringToCountry(req.Country)
+		billCountry, err := country.Parse(req.Country)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusBadRequest, r)
 		}
-		billCurrency, err := B.StringToCurrency(req.Currency)
+		billCurrency, err := currency.Parse(req.Currency)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusBadRequest, r)
 		}
 
 		billId := ksuid.New()
-		bill := B.BillNew(
+		billAccepted := bill.New(
 			billId.String(),
 			req.Name,
 			*billDate,
 			req.Price,
 			billCurrency,
 			billCountry,
-			[]*B.Item{},
-			B.Tag(req.Tags),
+			[]*item.Item{},
+			tag.Tag(req.Tags),
 			"",
 			"",
 		)
 		billApi := BillApi{
-			Id:           bill.Id,
+			Id:           billAccepted.Id,
 			Name:         req.Name,
-			Date:         bill.GetDateString(),
+			Date:         billAccepted.GetDateString(),
 			Price:        req.Price,
 			Currency:     req.Currency,
 			ExchangeRate: req.ExchangeRate,
@@ -77,7 +81,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			Duplicates:   0,
 		}
 
-		billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
+		billDupCount, err := s.BillRepo.CheckDuplicateBill(billAccepted)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusInternalServerError, r)
@@ -89,7 +93,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			return c.JSON(http.StatusOK, r)
 		}
 
-		err = s.BillRepo.InsertBill(bill)
+		err = s.BillRepo.InsertBill(billAccepted)
 		if err != nil {
 			r.Message = fmt.Sprintf("%v", err)
 			return c.JSON(http.StatusInternalServerError, r)

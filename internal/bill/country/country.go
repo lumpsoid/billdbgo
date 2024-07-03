@@ -1,4 +1,4 @@
-package bill
+package country
 
 import "fmt"
 
@@ -17,7 +17,7 @@ func (c Country) String() string {
 	return countryToString[c]
 }
 
-func StringToCountry(countryString string) (Country, error) {
+func Parse(countryString string) (Country, error) {
 	switch countryString {
 	case "serbia":
 		return SERBIA, nil
@@ -30,7 +30,7 @@ func StringToCountry(countryString string) (Country, error) {
 	}
 }
 
-func GetCountryList() []string {
+func Available() []string {
 	countryList := append([]string{}, countryToString...)
 	return countryList
 }

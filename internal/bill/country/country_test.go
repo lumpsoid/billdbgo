@@ -1,4 +1,4 @@
-package bill
+package country
 
 import (
 	"fmt"

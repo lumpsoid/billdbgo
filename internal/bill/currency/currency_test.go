@@ -1,4 +1,4 @@
-package bill
+package currency
 
 import (
 	"testing"

@@ -1,4 +1,4 @@
-package bill
+package item
 
 type Item struct {
 	ItemId   string
@@ -9,7 +9,7 @@ type Item struct {
 	Quantity float64
 }
 
-func ItemNew(
+func New(
 	itemId string,
 	billId string,
 	name string,

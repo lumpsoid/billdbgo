@@ -2,6 +2,10 @@ package parser
 
 import (
 	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -80,7 +84,7 @@ func queryNode(doc *html.Node, xpath string) (*html.Node, error) {
 func fetchItems(
 	doc *html.Node,
 	billId *ksuid.KSUID,
-) ([]*bill.Item, error) {
+) ([]*item.Item, error) {
 	invoceNode, err := queryNode(doc, invoiceXpath)
 	if err != nil {
 		return nil, err
@@ -136,16 +140,16 @@ func fetchItems(
 		return nil, err
 	}
 
-	items := make([]*bill.Item, 0)
+	items := make([]*item.Item, 0)
 	itemId := ksuid.New()
-	for _, item := range rJson.Items {
-		items = append(items, bill.ItemNew(
+	for _, itemCurrent := range rJson.Items {
+		items = append(items, item.New(
 			itemId.String(),
 			billId.String(),
-			item.Name,
-			item.Total,
-			item.UnitPrice,
-			item.Quantity,
+			itemCurrent.Name,
+			itemCurrent.Total,
+			itemCurrent.UnitPrice,
+			itemCurrent.Quantity,
 		))
 	}
 	return items, nil
@@ -202,12 +206,12 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 		return nil, err
 	}
 
-	country, err := bill.StringToCountry("serbia")
+	countryBill, err := country.Parse("serbia")
 	if err != nil {
 		log.Error("Error parsing country string: ", err)
 		return nil, err
 	}
-	currency, err := bill.StringToCurrency("rsd")
+	currencyBill, err := currency.Parse("rsd")
 	if err != nil {
 		log.Error("Error parsing currency string: ", err)
 		return nil, err
@@ -220,17 +224,17 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 		return nil, err
 	}
 
-	billObject := bill.BillNew(
+	billObject := bill.New(
 		billId.String(),
 		nodesStrings[nameXpath],
 		*dateTime,
 		price,
-		currency,
+		currencyBill,
 		//TODO exchange system migrate
 		// 1.0,
-		country,
+		countryBill,
 		items,
-		bill.Tag(""),
+		tag.Tag(""),
 		u.String(),
 		nodesStrings[billXpath],
 	)

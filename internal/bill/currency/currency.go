@@ -1,4 +1,4 @@
-package bill
+package currency
 
 import "fmt"
 
@@ -21,12 +21,12 @@ func (c Currency) String() string {
 	return currencyToString[c]
 }
 
-func GetCurrencyList() []string {
+func Available() []string {
 	currencyList := append([]string{}, currencyToString...)
 	return currencyList
 }
 
-func StringToCurrency(currencyStr string) (Currency, error) {
+func Parse(currencyStr string) (Currency, error) {
 	switch currencyStr {
 	case "usd":
 		return USD, nil
