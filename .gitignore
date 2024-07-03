@@ -1,3 +1,4 @@
 ./cmd/server/*.db
 *.db
 test
+.vscode
