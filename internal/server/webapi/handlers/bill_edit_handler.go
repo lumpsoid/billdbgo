@@ -34,7 +34,7 @@ var (
 				// TODO exchange rate system
 				// "exchange_rate": bill.ExchangeRate,
 				"country":    billRequested.GetCountryString(),
-				"tag":        billRequested.Tag.String(),
+				"tag":        billRequested.Tag.String,
 				"link":       billRequested.Link,
 				"bill_text":  billRequested.BillText,
 				"currencies": currencies,
@@ -62,7 +62,7 @@ var (
 			// TODO exchange rate system
 			// r["cExchangeRate"] = bill.ExchangeRate
 			r["cCountry"] = billEdited.GetCountryString()
-			r["cTag"] = billEdited.Tag.String()
+			r["cTag"] = billEdited.Tag.String
 			r["cLink"] = billEdited.Link
 
 			params, err := c.FormParams()
@@ -110,7 +110,7 @@ var (
 			// TODO exchange rate system
 			// r["nExchangeRate"] = bill.ExchangeRate
 			r["nCountry"] = billNew.GetCountryString()
-			r["nTag"] = billNew.Tag.String()
+			r["nTag"] = billNew.Tag.String
 			r["nLink"] = billNew.Link
 
 			// c.Response().Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")

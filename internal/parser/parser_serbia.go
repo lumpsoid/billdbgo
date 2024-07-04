@@ -234,7 +234,7 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 		// 1.0,
 		countryBill,
 		items,
-		tag.Tag(""),
+		tag.Empty(),
 		u.String(),
 		nodesStrings[billXpath],
 	)

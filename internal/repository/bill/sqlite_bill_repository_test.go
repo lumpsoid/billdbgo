@@ -5,6 +5,7 @@ import (
 	"billdb/internal/bill/country"
 	"billdb/internal/bill/currency"
 	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
 	"database/sql"
 	"fmt"
 	"os"
@@ -130,7 +131,7 @@ func TestInsertBill(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -196,8 +197,8 @@ func TestInsertBill(t *testing.T) {
 	if billCountry != "russia" {
 		t.Errorf("Expected Country '%d', got %s", b.Country, billCountry)
 	}
-	if billTag != b.Tag.String() {
-		t.Errorf("Expected Tag '%s', got %s", b.Tag, billTag)
+	if billTag != b.Tag.String {
+		t.Errorf("Expected Tag '%s', got %s", b.Tag.String, billTag)
 	}
 	if billLink != b.Link {
 		t.Errorf("Expected Link '%s', got %s", b.Link, billLink)
@@ -233,7 +234,7 @@ func TestGetBillById(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -266,8 +267,8 @@ func TestGetBillById(t *testing.T) {
 	if billById.Country != b.Country {
 		t.Errorf("Expected Country '%d', got %d", b.Country, billById.Country)
 	}
-	if billById.Tag != b.Tag {
-		t.Errorf("Expected Tag '%s', got %s", b.Tag, billById.Tag)
+	if billById.Tag.String != b.Tag.String {
+		t.Errorf("Expected Tag '%s', got %s", b.Tag.String, billById.Tag.String)
 	}
 	if billById.Link != b.Link {
 		t.Errorf("Expected Link '%s', got %s", b.Link, billById.Link)
@@ -311,7 +312,7 @@ func TestUpdateBill(t *testing.T) {
 			currency.RSD,
 			country.RUSSIA,
 			[]*item.Item{},
-			"",
+			tag.Empty(),
 			"linkString",
 			"billText",
 		),
@@ -323,7 +324,7 @@ func TestUpdateBill(t *testing.T) {
 			currency.EUR,
 			country.SERBIA,
 			[]*item.Item{},
-			"tag1,tag2,NEW",
+			tag.New("tag1,tag2,NEW"),
 			"linkStringNEW",
 			"billTextNEW",
 		),
@@ -335,9 +336,21 @@ func TestUpdateBill(t *testing.T) {
 			currency.EUR,
 			country.SERBIA,
 			[]*item.Item{},
-			"",
+			tag.New(""),
 			"linkStringNEW",
 			"billTextNEW",
+		),
+		bill.New(
+			id.String(),
+			"NEW",
+			time.Now(),
+			389.0,
+			currency.TRY,
+			country.TURKEY,
+			[]*item.Item{},
+			tag.Empty(),
+			"linkStringNEWsadf",
+			"billTextNEWxzvzcv",
 		),
 	}
 
@@ -408,11 +421,24 @@ func TestUpdateBill(t *testing.T) {
 		if b.Country.String() != billCountry {
 			t.Errorf("Expected Country '%s', got %s", b.Country, billCountry)
 		}
-		if len(b.Tag.String()) > 0 && billTag == nil {
-			t.Error("Expected Tag to be not nil")
+		if b.Tag.Valid && billTag == nil {
+			t.Errorf(
+				"Expected Tag to be valid: %v, got %v\n",
+				b.Tag.Valid,
+				billTag == nil,
+			)
 		}
-		if billTag != nil && b.Tag.String() != *billTag {
-			t.Errorf("Expected Tag '%s', got '%s'", b.Tag.String(), *billTag)
+		if !b.Tag.Valid == (billTag != nil) {
+			t.Errorf(
+				"Expected Tag to be not valid: %v, got %v\n",
+				b.Tag.Valid,
+				billTag != nil,
+			)
+		}
+		if b.Tag.Valid {
+			if b.Tag.String != *billTag {
+				t.Errorf("Expected Tag '%s', got '%s'", b.Tag.String, *billTag)
+			}
 		}
 		if b.Link != billLink {
 			t.Errorf("Expected Link '%s', got %s", b.Link, billLink)
@@ -448,7 +474,7 @@ func TestDeleteBill(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -520,7 +546,7 @@ func TestCheckDuplicateBill(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -566,7 +592,7 @@ func TestScanToBill(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -613,8 +639,8 @@ func TestScanToBill(t *testing.T) {
 	if bN.Country != b.Country {
 		t.Errorf("Expected Country '%d', got %d", b.Country, bN.Country)
 	}
-	if bN.Tag != b.Tag {
-		t.Errorf("Expected Tag '%s', got %s", b.Tag, bN.Tag)
+	if bN.Tag.String != b.Tag.String {
+		t.Errorf("Expected Tag '%s', got %s", b.Tag.String, bN.Tag.String)
 	}
 	if bN.Link != b.Link {
 		t.Errorf("Expected Link '%s', got %s", b.Link, bN.Link)
@@ -644,7 +670,7 @@ func TestInsertItems(t *testing.T) {
 		currency.RSD,
 		country.RUSSIA,
 		[]*item.Item{},
-		"tag1,tag2",
+		tag.New("tag1,tag2"),
 		"linkString",
 		"billText",
 	)
@@ -853,222 +879,4 @@ func TestDeleteItems(t *testing.T) {
 		t.Error("Expected no rows in item_tag table")
 	}
 	rows.Close()
-}
-
-type ChangeBill struct {
-	IdOld string
-	IdNew string
-}
-
-func ChangeBillNew(idOld string, idNew string) *ChangeBill {
-	return &ChangeBill{
-		IdOld: idOld,
-		IdNew: idNew,
-	}
-}
-
-func TestRunBillMigration(t *testing.T) {
-	db, err := sql.Open(
-		"sqlite3",
-		"/home/qq/Documents/programming/go/billdb/billdbIDchange.db",
-	)
-	if err != nil {
-		t.Errorf("Failed to open sqlite database: %v", err)
-		return
-	}
-	defer db.Close()
-
-	_, err = db.Exec(`DELETE FROM invoice_tag WHERE invoice_id = '20220726827336';
-	DELETE FROM invoice WHERE invoice_id = '20220726827336';`)
-	if err != nil {
-		t.Errorf("Failed to update ID: %v", err)
-		return
-	}
-
-	rows, err := db.Query("SELECT invoice_id, invoice_date FROM invoice ORDER BY invoice_date;")
-	if err != nil {
-		t.Errorf("Failed to query database: %v", err)
-		return
-	}
-	defer rows.Close()
-
-	layoutDate := "2006-01-02"
-	var bills []ChangeBill
-	for rows.Next() {
-		var (
-			idOld  string
-			idDate string
-		)
-		err = rows.Scan(&idOld, &idDate)
-		if err != nil {
-			t.Errorf("Failed to scan row: %v", err)
-			return
-		}
-		billDateTime, err := time.Parse(layoutDate, idDate)
-		if err != nil {
-			t.Errorf("Failed to parse date: %v", err)
-			return
-		}
-		idNew, err := ksuid.NewRandomWithTime(billDateTime)
-		if err != nil {
-			t.Errorf("Failed to generate new ID: %v", err)
-			return
-		}
-		bills = append(bills, *ChangeBillNew(idOld, idNew.String()))
-	}
-	rows.Close()
-
-	tx, err := db.Begin()
-	if err != nil {
-		t.Errorf("Failed to start transaction: %v", err)
-		return
-	}
-
-	// Disable foreign key constraints using PRAGMA
-	_, err = tx.Exec("PRAGMA foreign_keys = OFF;")
-	if err != nil {
-		t.Error("Error disabling foreign key constraints:", err)
-		return
-	}
-
-	for _, bill := range bills {
-		if err != nil {
-			t.Errorf("Failed to generate new ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE item SET invoice_id = ? WHERE invoice_id = ?", bill.IdNew, bill.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE invoice_tag SET invoice_id = ? WHERE invoice_id = ?", bill.IdNew, bill.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE invoice SET invoice_id = ? WHERE invoice_id = ?", bill.IdNew, bill.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-	}
-
-	// Enable foreign key constraints back
-	_, err = tx.Exec("PRAGMA foreign_keys = ON;")
-	if err != nil {
-		tx.Rollback()
-		t.Error("Error enabling foreign key constraints:", err)
-		return
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		t.Errorf("Failed to commit transaction: %v", err)
-		return
-	}
-	db.Close()
-	t.Errorf("Migration successful")
-}
-
-type ItemChange struct {
-	IdOld string
-	IdNew string
-}
-
-func ItemChangeNew(idOld string, idNew string) *ItemChange {
-	return &ItemChange{
-		IdOld: idOld,
-		IdNew: idNew,
-	}
-}
-
-func TestRunItemMigration(t *testing.T) {
-	db, err := sql.Open(
-		"sqlite3",
-		"/home/qq/Documents/programming/go/billdb/billdbIDchange.db",
-	)
-	if err != nil {
-		t.Errorf("Failed to open sqlite database: %v", err)
-		return
-	}
-	defer db.Close()
-
-	rows, err := db.Query("SELECT item_id FROM item;")
-	if err != nil {
-		t.Errorf("Failed to query database: %v", err)
-		return
-	}
-	defer rows.Close()
-
-	var items []*ItemChange
-	for rows.Next() {
-		var (
-			idOld string
-		)
-		err = rows.Scan(&idOld)
-		if err != nil {
-			t.Errorf("Failed to scan row: %v", err)
-			return
-		}
-		idNew := ksuid.New()
-		items = append(items, ItemChangeNew(idOld, idNew.String()))
-	}
-	rows.Close()
-
-	tx, err := db.Begin()
-	if err != nil {
-		t.Errorf("Failed to start transaction: %v", err)
-		return
-	}
-
-	// Disable foreign key constraints using PRAGMA
-	_, err = tx.Exec("PRAGMA foreign_keys = OFF;")
-	if err != nil {
-		t.Error("Error disabling foreign key constraints:", err)
-		return
-	}
-
-	for _, item := range items {
-		if err != nil {
-			t.Errorf("Failed to generate new ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE item SET item_id = ? WHERE item_id = ?", item.IdNew, item.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE item_photo SET item_id = ? WHERE item_id = ?", item.IdNew, item.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-		_, err = tx.Exec("UPDATE item_tag SET item_id = ? WHERE item_id = ?", item.IdNew, item.IdOld)
-		if err != nil {
-			tx.Rollback()
-			t.Errorf("Failed to update ID: %v", err)
-			return
-		}
-	}
-
-	// Enable foreign key constraints back
-	_, err = tx.Exec("PRAGMA foreign_keys = ON;")
-	if err != nil {
-		tx.Rollback()
-		t.Error("Error enabling foreign key constraints:", err)
-		return
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		t.Errorf("Failed to commit transaction: %v", err)
-		return
-	}
-	db.Close()
-	t.Errorf("Migration successful")
 }

@@ -29,7 +29,7 @@ var (
 				// TODO exchange rate system
 				// "exchange_rate": bill.ExchangeRate,
 				"country":   bill.GetCountryString(),
-				"tag":       bill.Tag.String(),
+				"tag":       bill.Tag.String,
 				"link":      bill.Link,
 				"bill_text": bill.BillText,
 				"items":     items,

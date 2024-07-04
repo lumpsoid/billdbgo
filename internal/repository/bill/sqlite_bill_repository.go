@@ -60,16 +60,22 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 	if err != nil {
 		return err
 	}
-	if len(bill.Tag) > 0 {
+	if bill.Tag.Valid {
 		var tagID int64
-		err = tx.QueryRow("SELECT tag_id FROM tag WHERE tag_name = ?", bill.Tag).Scan(&tagID)
+		err = tx.QueryRow(
+			"SELECT tag_id FROM tag WHERE tag_name = ?",
+			bill.Tag.String,
+		).Scan(&tagID)
 		if err != nil && err != sql.ErrNoRows {
 			tx.Rollback()
 			return err
 		}
 
 		if tagID == 0 { // Tag does not exist, insert it
-			result, err := tx.Exec("INSERT INTO tag (tag_name) VALUES (?)", bill.Tag)
+			result, err := tx.Exec(
+				"INSERT INTO tag (tag_name) VALUES (?)",
+				bill.Tag.String,
+			)
 			if err != nil {
 				tx.Rollback()
 				return err
@@ -82,7 +88,11 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 		}
 
 		// Link invoice and tag
-		_, err = tx.Exec("INSERT INTO invoice_tag (invoice_id, tag_id) VALUES (?, ?)", bill.Id, tagID)
+		_, err = tx.Exec(
+			"INSERT INTO invoice_tag (invoice_id, tag_id) VALUES (?, ?)",
+			bill.Id,
+			tagID,
+		)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -165,6 +175,23 @@ func (r *SqliteBillRepository) UpdateBill(bill *bl.Bill) error {
 		return fmt.Errorf("no rows affected")
 	}
 
+	if !bill.Tag.Valid {
+		_, err = tx.Exec(
+			"DELETE FROM invoice_tag WHERE invoice_id = ?;",
+			bill.Id,
+		)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		err = tx.Commit()
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		return nil
+	}
+
 	// Prepare the INSERT statement to insert tag_name
 	// if it doesn't already exist
 	insertQuery := `
@@ -174,7 +201,11 @@ func (r *SqliteBillRepository) UpdateBill(bill *bl.Bill) error {
 	`
 
 	// Execute the INSERT statement
-	_, err = tx.Exec(insertQuery, bill.Tag, bill.Tag)
+	_, err = tx.Exec(
+		insertQuery,
+		bill.Tag.String,
+		bill.Tag.String,
+	)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("error inserting tag: %w", err)
@@ -186,7 +217,7 @@ func (r *SqliteBillRepository) UpdateBill(bill *bl.Bill) error {
 	`
 
 	var tagID int64
-	err = tx.QueryRow(selectQuery, bill.Tag).Scan(&tagID)
+	err = tx.QueryRow(selectQuery, bill.Tag.String).Scan(&tagID)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("error getting tag_id: %w", err)
@@ -541,7 +572,7 @@ func ScanToBill(row interface{}) (*bl.Bill, error) {
 		// ExchangeRate,
 		billCountry,
 		[]*item.Item{},
-		tag.New(Tag),
+		tag.NewFromNullable(Tag),
 		Link,
 		"",
 	)

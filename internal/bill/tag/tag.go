@@ -4,21 +4,50 @@ import (
 	"regexp"
 )
 
-type Tag string
-
-func New(tag *string) Tag {
-	if tag == nil {
-		return Tag("")
-	}
-	return Tag(*tag)
+type Tag struct {
+	String string
+	Valid  bool
 }
 
-func (t Tag) String() string {
-	return string(t)
+func New(tag string) *Tag {
+	if tag == "" {
+		return &Tag{
+			String: "empty",
+			Valid:  false,
+		}
+	}
+	return &Tag{
+		String: tag,
+		Valid:  true,
+	}
+}
+
+func NewFromNullable(tag *string) *Tag {
+	emptyTag := &Tag{
+		String: "empty",
+		Valid:  false,
+	}
+	if tag == nil {
+		return emptyTag
+	}
+	if *tag == "" {
+		return emptyTag
+	}
+	return &Tag{
+		String: *tag,
+		Valid:  true,
+	}
+}
+
+func Empty() *Tag {
+	return &Tag{
+		String: "empty",
+		Valid:  false,
+	}
 }
 
 // Validate Tag to be in format 'tag1,tag2,tag3'
 func (t Tag) Validate() bool {
 	regex := regexp.MustCompile(`([a-z],)`)
-	return regex.MatchString(string(t))
+	return regex.MatchString(t.String)
 }
