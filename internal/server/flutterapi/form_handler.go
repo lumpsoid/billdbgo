@@ -64,7 +64,7 @@ var FormHandler = server.Post(baseApiPath+"/form", func(s *server.Server) echo.H
 			billCurrency,
 			billCountry,
 			[]*item.Item{},
-			tag.Tag(req.Tags),
+			tag.New(req.Tags),
 			"",
 			"",
 		)

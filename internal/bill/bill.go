@@ -18,7 +18,7 @@ type Bill struct {
 	Currency currency.Currency
 	Country  country.Country
 	Items    []*item.Item
-	Tag      tag.Tag // TODO add posibility to be nil
+	Tag      *tag.Tag // TODO add posibility to be nil
 	Link     string
 	BillText string // TODO transform into a struct
 }
@@ -31,7 +31,7 @@ func New(
 	currency currency.Currency,
 	country country.Country,
 	items []*item.Item,
-	tag tag.Tag,
+	tag *tag.Tag,
 	link string,
 	billText string,
 ) *Bill {
@@ -101,7 +101,7 @@ func UpdateBillProperty(bill *Bill, property string, value interface{}) error {
 		}
 		bill.Country = countryNew
 	case "tag":
-		bill.Tag = tag.Tag(value.(string))
+		bill.Tag = tag.New(value.(string))
 	case "link":
 		bill.Link = value.(string)
 	}

@@ -80,7 +80,7 @@ var (
 				billCurrency,
 				billCountry,
 				[]*item.Item{},
-				tag.Tag(b.Tag),
+				tag.New(b.Tag),
 				"",
 				"",
 			)
