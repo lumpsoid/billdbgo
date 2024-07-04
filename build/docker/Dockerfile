@@ -1,5 +1,5 @@
 # Use golang base image on Alpine
-FROM golang:alpine as base
+FROM golang:alpine AS base
 
 # Set environment variables
 ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
@@ -19,7 +19,7 @@ COPY ./go.mod ./go.sum ./
 RUN go mod download
 
 # Stage for building the application
-FROM base as build
+FROM base AS build
 
 # Copy the source code
 COPY ./cmd ./cmd
