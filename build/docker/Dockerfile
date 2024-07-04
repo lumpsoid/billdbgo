@@ -39,7 +39,7 @@ ENV BILLDB_TEMPLATE_PATH=/server/templates/* \
     BILLDB_DB_PATH=/server/data/bills.db
 WORKDIR /server
 COPY --from=build /billdb/server ./server
-#COPY --from=build /billdb/data ./data
+COPY --from=build /billdb/data ./data
 COPY ./web/templates ./templates
 COPY ./web/static ./static
 EXPOSE 1323
