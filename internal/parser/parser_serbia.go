@@ -141,10 +141,9 @@ func fetchItems(
 	}
 
 	items := make([]*item.Item, 0)
-	itemId := ksuid.New()
 	for _, itemCurrent := range rJson.Items {
 		items = append(items, item.New(
-			itemId.String(),
+			ksuid.New().String(),
 			billId.String(),
 			itemCurrent.Name,
 			itemCurrent.Total,
