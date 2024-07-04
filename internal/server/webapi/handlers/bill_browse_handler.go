@@ -62,7 +62,7 @@ var (
 			db := s.BillRepo.GetDb()
 			rows, err := db.Query(query)
 			if err != nil {
-				r["message"] = fmt.Sprintf("Error while querying the database: %v", err)
+				r["message"] = fmt.Sprintf("Error while querying the database: %v; Db path: %s", err, s.Config.DbPath)
 				return c.Render(http.StatusOK, "browse-bills.html", r)
 			}
 			defer rows.Close()
