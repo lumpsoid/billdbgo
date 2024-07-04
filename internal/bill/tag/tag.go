@@ -23,11 +23,15 @@ func New(tag string) *Tag {
 }
 
 func NewFromNullable(tag *string) *Tag {
+	emptyTag := &Tag{
+		String: "empty",
+		Valid:  false,
+	}
 	if tag == nil {
-		return &Tag{
-			String: "empty",
-			Valid:  false,
-		}
+		return emptyTag
+	}
+	if *tag == "" {
+		return emptyTag
 	}
 	return &Tag{
 		String: *tag,
