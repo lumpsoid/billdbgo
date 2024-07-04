@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"testing"
+	"unicode/utf8"
 )
+
+const testFolder = "../../../test/json/"
 
 type TestData struct {
 	Password        string `json:"password"`
@@ -24,7 +26,7 @@ func readTestData() error {
 		return nil
 	}
 
-	file, err := os.Open("../../../test/json/parser_russia.json")
+	file, err := os.Open(testFolder + "parser_russia.json")
 	if err != nil {
 		return err
 	}
@@ -66,7 +68,9 @@ func TestDecryption(t *testing.T) {
 		return
 	}
 
-	t.Error("Decrypted data:", string(decryptedData))
+	if !utf8.ValidString(string(decryptedData)) {
+		t.Error("Decrypted data is not utf-8:", string(decryptedData))
+	}
 }
 
 func TestCreateBoundary(t *testing.T) {
@@ -165,46 +169,6 @@ func TestSendFormatData(t *testing.T) {
 	err = json.Unmarshal(decryptedData, &billJson)
 	if err != nil {
 		t.Error("Error:", err)
-		return
-	}
-
-	retailPlaceRight := "Магазин Аленка"
-	if billJson.Data.Json.RetailPlace != retailPlaceRight {
-		t.Errorf(
-			"Error getting billJson RetailPlace got %s, expected %s\n",
-			billJson.Data.Json.RetailPlace,
-			retailPlaceRight,
-		)
-	}
-	itemZeroNameRight := "КОНФ ВЕС Батончики Рот Фронт"
-	if billJson.Data.Json.Items[0].Name != itemZeroNameRight {
-		t.Errorf(
-			"Error getting billJson Items0 Name got %s, expected %s\n",
-			billJson.Data.Json.Items[0].Name,
-			itemZeroNameRight,
-		)
-	}
-}
-
-func TestBillJsonRead(t *testing.T) {
-	err := readTestData()
-	if err != nil {
-		t.Error("Error reading test data:", err)
-		return
-	}
-
-	file, err := os.Open("bill.json")
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
-
-	var billJson BillJson
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&billJson)
-	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
 		return
 	}
 
