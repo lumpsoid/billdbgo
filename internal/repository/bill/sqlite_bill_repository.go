@@ -62,14 +62,20 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 	}
 	if bill.Tag.Valid {
 		var tagID int64
-		err = tx.QueryRow("SELECT tag_id FROM tag WHERE tag_name = ?", bill.Tag).Scan(&tagID)
+		err = tx.QueryRow(
+			"SELECT tag_id FROM tag WHERE tag_name = ?",
+			bill.Tag.String,
+		).Scan(&tagID)
 		if err != nil && err != sql.ErrNoRows {
 			tx.Rollback()
 			return err
 		}
 
 		if tagID == 0 { // Tag does not exist, insert it
-			result, err := tx.Exec("INSERT INTO tag (tag_name) VALUES (?)", bill.Tag)
+			result, err := tx.Exec(
+				"INSERT INTO tag (tag_name) VALUES (?)",
+				bill.Tag.String,
+			)
 			if err != nil {
 				tx.Rollback()
 				return err
@@ -82,7 +88,11 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 		}
 
 		// Link invoice and tag
-		_, err = tx.Exec("INSERT INTO invoice_tag (invoice_id, tag_id) VALUES (?, ?)", bill.Id, tagID)
+		_, err = tx.Exec(
+			"INSERT INTO invoice_tag (invoice_id, tag_id) VALUES (?, ?)",
+			bill.Id,
+			tagID,
+		)
 		if err != nil {
 			tx.Rollback()
 			return err
