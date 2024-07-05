@@ -479,7 +479,7 @@ func (r *SqliteBillRepository) CheckDuplicateBill(bill *bl.Bill) (int, error) {
 		bill.GetCurrencyString(),
 	)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 	defer rows.Close()
 
@@ -488,7 +488,7 @@ func (r *SqliteBillRepository) CheckDuplicateBill(bill *bl.Bill) (int, error) {
 		var id string
 		err = rows.Scan(&id)
 		if err != nil {
-			return -1, err
+			return 0, err
 		}
 		billArr = append(billArr, id)
 	}
