@@ -8,7 +8,9 @@
 </head>
 
 <body>
-  <h1>Expenses management</h1>
+  <h1>Expenses management
+    <span style="font-size: small; font-weight: normal;">{{.version}}</span>
+  </h1>
   <div>
     <h2>Add bill</h2>
     <ul>
@@ -24,10 +26,10 @@
     <h2>Management</h2>
     <ul>
       <li>
-        <a href="{{call .reverse "browse-landing"}}">Browse</a>
+        <a href="{{call .reverse " browse-landing"}}">Browse</a>
       </li>
       <li>
-        <a href="{{call .reverse "search"}}">Search</a>
+        <a href="{{call .reverse " search"}}">Search</a>
       </li>
     </ul>
   </div>
@@ -35,10 +37,10 @@
     <h2>DB</h2>
     <ul>
       <li>
-        <a href="{{call .reverse "db-save"}}">Backup</a>
+        <a href="{{call .reverse " db-save"}}">Backup</a>
       </li>
       <li>
-        <a href="{{call .reverse "db-upload"}}">Upload</a>
+        <a href="{{call .reverse " db-upload"}}">Upload</a>
       </li>
     </ul>
   </div>
