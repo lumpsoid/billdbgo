@@ -1,5 +1,5 @@
 # Use golang base image on Alpine
-FROM golang:alpine AS base
+FROM golang:alpine AS development
 
 # Set environment variables
 ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
@@ -18,15 +18,19 @@ WORKDIR /billdb
 COPY ./go.mod ./go.sum ./
 RUN go mod download
 
-# Stage for building the application
-FROM base AS build
-
 # Copy the source code
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 
-# Create necessary directory
+# Copy the static files
+COPY ./web/templates ./templates
+COPY ./web/static ./static
+
+# Create directory for db
 RUN mkdir ./data
+
+# Stage for building the application
+FROM development AS build
 
 # Set environment variables and build the application
 ENV CGO_ENABLED=1
@@ -39,9 +43,9 @@ ENV BILLDB_TEMPLATE_PATH=/server/templates/* \
     BILLDB_DB_PATH=/server/data/bills.db
 WORKDIR /server
 COPY --from=build /billdb/server ./server
+COPY --from=build /billdb/templates ./templates
+COPY --from=build /billdb/static ./static
 COPY --from=build /billdb/data ./data
-COPY ./web/templates ./templates
-COPY ./web/static ./static
 EXPOSE 1323
 
 CMD ["/server/server"]

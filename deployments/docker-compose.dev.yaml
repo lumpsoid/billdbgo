@@ -3,17 +3,27 @@ services:
     build:
       context: ..
       dockerfile: ./build/docker/Dockerfile
-      target: base
+      target: development
+    develop:
+      watch:
+        - path: ../web/templates
+          action: sync+restart
+          target: /billdb/templates
+        - path: ../web/static
+          action: sync+restart
+          target: /billdb/static
+        - path: ../cmd
+          action: sync+restart
+          target: /billdb/cmd
+        - path: ../internal
+          action: sync+restart
+          target: /billdb/internal
     command: go run ./cmd/server/main.go
     ports:
       - "8080:1323"
     environment:
       - BILLDB_DB_PATH=/billdb/data/bills.db
+      #- BILLDB_DB_PATH=/billdb/data/NEEDTOCOLAPSE.db
     volumes:
       - ../../billdb-docker-test/data:/billdb/data
-      - ../web/templates:/billdb/templates
-      - ../web/static:/billdb/static
-      - ../cmd:/billdb/cmd
-      - ../internal/:/billdb/internal
     restart: unless-stopped
-

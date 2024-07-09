@@ -1,0 +1,12 @@
+services:
+  billdb-go:
+    build:
+      context: ..
+      dockerfile: ./build/docker/Dockerfile
+    ports:
+      - "8080:1323"
+    environment:
+      - BILLDB_DB_PATH=/billdb/data/bills.db
+    volumes:
+      - ../../billdb-docker-test/data:/billdb/data
+    restart: unless-stopped
