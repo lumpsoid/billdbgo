@@ -8,12 +8,13 @@
 </head>
 
 <body>
-    <h1>Bill from link</h1>
-    <form action="{{call .reverse "bill-from-link"}}" method="post" target="_self">
-        <label for="linkField">Enter Link:</label>
-        <input type="text" id="linkField" name="link" placeholder="Enter URL">
-        <button id="submitLink">Submit</button>
-    </form>
+  <h1 style="display: inline;">Bill from link</h1>
+  <a href="/">Home</a>
+  <form action="{{call .reverse "bill-from-link"}}" method="post" target="_self">
+      <label for="linkField">Enter Link:</label>
+      <input type="text" id="linkField" name="link" placeholder="Enter URL">
+      <button id="submitLink">Submit</button>
+  </form>
 </body>
 
 </html>
