@@ -5,7 +5,6 @@ import (
 	"billdb/internal/server"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/labstack/echo/v4"
 )
@@ -33,19 +32,13 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 			return c.JSON(http.StatusBadRequest, r)
 		}
 
-		u, err := url.Parse(req.Link)
-		if err != nil {
-			r.Message = fmt.Sprintf("Error while parsing url: %v", err)
-			return c.JSON(http.StatusBadRequest, r)
-		}
-
-		p, err := parser.GetBillParser(u)
+		p, err := parser.GetBillParser(req.Link)
 		if err != nil {
 			r.Message = fmt.Sprintf("Error while getting parser for the url: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 
-		bill, err := p.Parse(u)
+		bill, err := p.Parse(req.Link)
 		if err != nil {
 			r.Message = fmt.Sprintf("Error while parsing the bill: %v", err)
 			return c.JSON(http.StatusInternalServerError, r)

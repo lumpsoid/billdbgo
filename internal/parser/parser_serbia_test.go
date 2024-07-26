@@ -62,14 +62,9 @@ func TestDateParse(t *testing.T) {
 	}
 
 	for index, link := range links {
-		u, err := url.Parse(link)
-		if err != nil {
-			t.Errorf("Failed to parse URL: %v", err)
-			return
-		}
 
 		parser := &ParserSerbia{}
-		billObject, err := parser.Parse(u)
+		billObject, err := parser.Parse(link)
 		if err != nil {
 			t.Errorf("Error parsing URL: %v", err)
 			return
@@ -175,14 +170,8 @@ func TestParserSerbia_Parse(t *testing.T) {
 
 	parser := &ParserSerbia{}
 
-	u, err := url.Parse(urlLink)
-	if err != nil {
-		t.Errorf("Failed to parse URL: %v", err)
-		return
-	}
-
 	// Call the Parse method
-	billObject, err := parser.Parse(u)
+	billObject, err := parser.Parse(urlLink)
 	if err != nil {
 		t.Errorf("Error parsing URL: %v", err)
 		return

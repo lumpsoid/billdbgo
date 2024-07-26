@@ -2,12 +2,11 @@ package parser
 
 import (
 	"billdb/internal/bill"
-	"net/url"
 )
 
 // Parser defines the interface for parsing URLs.
 type Parser interface {
-	Parse(u *url.URL) (*bill.Bill, error)
+	Parse(u string) (*bill.Bill, error)
 }
 
 // UnimplementedError represents an unimplemented feature error.
@@ -26,9 +25,10 @@ func NewUnimplementedError(message string) *UnimplementedError {
 }
 
 // GetBillParser creates a parser for a given URL.
-func GetBillParser(u *url.URL) (Parser, error) {
-	if u.Hostname() == "suf.purs.gov.rs" {
+func GetBillParser(data string) (Parser, error) {
+  switch data {
+  case "https://suf.purs.gov.rs":
 		return &ParserSerbia{}, nil
-	}
+  }
 	return nil, NewUnimplementedError("No parser available for the given URL")
 }

@@ -163,8 +163,8 @@ func dateParse(dateLayout string, dateString string) (*time.Time, error) {
 	return &dateTime, nil
 }
 
-func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
-	doc, err := htmlquery.LoadURL(u.String())
+func (p *ParserSerbia) Parse(u string) (*bill.Bill, error) {
+	doc, err := htmlquery.LoadURL(u)
 	if err != nil {
 		log.Error("Error loading URL: ", err)
 		return nil, err
@@ -234,7 +234,7 @@ func (p *ParserSerbia) Parse(u *url.URL) (*bill.Bill, error) {
 		countryBill,
 		items,
 		tag.Empty(),
-		u.String(),
+		u,
 		nodesStrings[billXpath],
 	)
 
