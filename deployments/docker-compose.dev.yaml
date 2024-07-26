@@ -26,4 +26,3 @@ services:
       #- BILLDB_DB_PATH=/billdb/data/NEEDTOCOLAPSE.db
     volumes:
       - ../../billdb-docker-test/data:/billdb/data
-    restart: unless-stopped
