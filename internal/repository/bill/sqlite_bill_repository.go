@@ -107,6 +107,21 @@ func (r *SqliteBillRepository) InsertBill(bill *bl.Bill) error {
 	return nil
 }
 
+func (r *SqliteBillRepository) InsertBillWithItems(bill *bl.Bill) error {
+  err := r.InsertBill(bill)
+  if err != nil {
+    return err
+  }
+  if len(bill.Items) == 0 {
+    return nil
+  }
+  err = r.InsertItems(bill.Items)
+  if err != nil {
+    return err
+  }
+  return nil
+}
+
 // fetching a bill from the database by ID without items
 func (r *SqliteBillRepository) GetBillByID(id string) (*bl.Bill, error) {
 	query := `SELECT
@@ -260,6 +275,10 @@ func (r *SqliteBillRepository) DeleteBill(id string) error {
 
 // Implementation for checking unique item names
 func (r *SqliteBillRepository) InsertItems(items []*item.Item) error {
+  if len(items) == 0 {
+    return nil
+  }
+
 	stmt, err := r.DB.Prepare(
 		"INSERT INTO item ( item_id, invoice_id, item_name, item_price, item_price_one, item_quantity) VALUES (?,?,?,?,?,?)")
 	if err != nil {
