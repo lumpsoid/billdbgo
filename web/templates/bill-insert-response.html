@@ -10,6 +10,7 @@
 <body>
   {{ if .success }}
   <h2 style="display: inline;">Bill added successfully</h2>
+  <a href="{{call .reverse "index"}}">Home</a>
   <a href="{{ call .reverse "bill-view" .bill.Id}}">View</a>
 
   <p>Id: {{ .bill.Id }}</p>
@@ -27,6 +28,7 @@
   <a href="{{call .reverse "bill-view" .dupId}}">View duplicate</a>
   </li>
   {{end}}
+  <a href="{{call .reverse "index"}}">Home</a>
   {{ end }}
   <a href="{{call .reverse "bill-from-qr"}}">Submit new qr</a>
 
