@@ -17,15 +17,17 @@ func ParseImage(filePath string) (string, error) {
 	cmd := exec.Command("zbarimg", filePath)
 
   var out bytes.Buffer
+  var outErr bytes.Buffer
 
 	cmd.Stdout = &out
+	cmd.Stderr = &outErr
 
   err = cmd.Run()
 	if err != nil {
     if "exit status 4" == err.Error() {
       return "", errors.New("qr code was not detected")
     }
-    return "", err
+    return "", errors.New(string(outErr.Bytes()))
 	}
   qrString, err := out.ReadString('\n')
   if !strings.HasPrefix(qrString, "QR-Code:") {
