@@ -23,6 +23,10 @@
   {{ else }}
   <h2>Failed to add bill</h2>
   <p>{{ .message }}</p>
+  {{ if .qrPath }}
+  <img src="/uploaded/{{.qrPath}}" alt="user's qr code response">
+  <br>
+  {{ end }}
   {{if .dupId}}
   <li>
   <a href="{{call .reverse "bill-view" .dupId}}">View duplicate</a>

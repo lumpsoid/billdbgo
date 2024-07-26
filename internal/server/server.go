@@ -17,6 +17,7 @@ type Config struct {
 	DbPath        string
 	TemplatesPath string
 	StaticPath    string
+	QrPath        string
 }
 
 type Server struct {
@@ -40,6 +41,10 @@ func LoadConfig() (*Config, error) {
 	cfg.StaticPath, present = os.LookupEnv("BILLDB_STATIC_PATH")
 	if !present {
 		return nil, fmt.Errorf("BILLDB_STATIC_PATH not set")
+	}
+	cfg.QrPath, present = os.LookupEnv("BILLDB_QR_TMP_PATH")
+	if !present {
+		return nil, fmt.Errorf("BILLDB_QR_TMP_PATH not set")
 	}
 	return &cfg, nil
 }
@@ -78,20 +83,20 @@ func IndexOf(slice []string, value string) int {
 }
 
 func CheckFormFile(file *multipart.FileHeader) error {
-  if file.Size > 1048576 {
-    return fmt.Errorf("file size is more then 1Mb: %d", file.Size)
-  }
-  fileType := file.Header.Get("Content-Type")
-  typeArray := []string{"image/jpeg", "image/jpg", "image/png", "image/avif"}
-  typeSupported := IndexOf(typeArray, fileType)
-  if typeSupported == -1 {
-    return errors.New("file type is not supported")
-  }
-  return nil
+	if file.Size > 1048576 {
+		return fmt.Errorf("file size is more then 1Mb: %d", file.Size)
+	}
+	fileType := file.Header.Get("Content-Type")
+	typeArray := []string{"image/jpeg", "image/jpg", "image/png", "image/avif"}
+	typeSupported := IndexOf(typeArray, fileType)
+	if typeSupported == -1 {
+		return errors.New("file type is not supported")
+	}
+	return nil
 }
 
-func UploadFileToServer(file *multipart.FileHeader) (string, error) {
-// Open the uploaded file
+func UploadFileToServer(folderPath string, file *multipart.FileHeader) (string, error) {
+	// Open the uploaded file
 	src, err := file.Open()
 	if err != nil {
 		return "", fmt.Errorf("error opening file: %w", err)
@@ -99,9 +104,8 @@ func UploadFileToServer(file *multipart.FileHeader) (string, error) {
 	defer src.Close()
 
 	// Define the destination path
-  tmpName := ksuid.New().String()
-  tmpDir := os.TempDir()
-	dstPath := filepath.Join(tmpDir, tmpName)
+	tmpName := ksuid.New().String()
+	dstPath := filepath.Join(folderPath, tmpName)
 
 	// Create the destination file
 	dst, err := os.Create(dstPath)
@@ -116,4 +120,5 @@ func UploadFileToServer(file *multipart.FileHeader) (string, error) {
 		return "", fmt.Errorf("error copying file: %w", err)
 	}
 
-	return dstPath, nil}
+	return dstPath, nil
+}

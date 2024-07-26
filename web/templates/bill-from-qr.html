@@ -44,8 +44,8 @@
         img.crossOrigin = "anonymous";
         img.onload = function () {
           // Set the desired width or height while maintaining aspect ratio
-          const maxWidth = 500; // Set the desired max width
-          const maxHeight = 500; // Set the desired max height
+          const maxWidth = 700; // Set the desired max width
+          const maxHeight = 700; // Set the desired max height
           let width = img.width;
           let height = img.height;
 
@@ -86,7 +86,7 @@
             fileInfoDiv.innerHTML = `
               <p>File Size: ${fileSize} KB</p>
             `;
-          }, 'image/jpeg', 0.8); // Adjust the quality as needed
+          }, 'image/jpeg', 0.9); // Adjust the quality as needed
         };
         img.src = e.target.result;
       };
