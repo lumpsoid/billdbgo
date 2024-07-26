@@ -9,7 +9,11 @@ You can use flutter app to scan QR codes and send them to the server. The flutte
 This is a refactor of the python version of the project. The original project can be found here: [billdb flask server](https://github.com/lumpsoid/billdb_flask_api), and [billdb package](https://github.com/lumpsoid/billdb).
 
 ## Features
-- Bill information parsing: The application can extract information from QR codes found on Serbian bills.
-- Bill management: Users can view, organize, and categorize their bills.
+- Parsing of invoice information: The application can extract information from the QR code on the bill.
+- Server-side decoding of QR codes
+- Invoice management
+    - view
+    - search
+    - organize
 - Expense tracking: Users can track their expenses over time.
 - API endpoints: Provides API endpoints for integrating with other applications or services.
