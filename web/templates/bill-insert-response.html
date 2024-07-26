@@ -14,11 +14,10 @@
 
   <p>Id: {{ .bill.Id }}</p>
   <p>Name: {{ .bill.Name }}</p>
-  <p>Tags: {{ .bill.Tag }}</p>
+  <p>Tags: {{ .bill.Tag.String }}</p>
   <p>Date: {{ .bill.Date }}</p>
   <p>Price: {{ .bill.Price }}</p>
   <p>Currency: {{ .bill.Currency }}</p>
-  <p>Exchange rate: {{ .bill.ExchangeRate }}</p>
   <p>Country: {{ .bill.Country }}</p>
   {{ else }}
   <h2>Failed to add bill</h2>
@@ -29,7 +28,7 @@
   </li>
   {{end}}
   {{ end }}
-  <a href="{{call .reverse "bill-form"}}">Submit new form</a>
+  <a href="{{call .reverse "bill-from-qr"}}">Submit new qr</a>
 
 </body>
 

@@ -13,6 +13,7 @@
     {{ if .success }}
     <h2 style="display: inline;">Bills {{.year}}-{{.month}}</h2>
     <a href="{{ call .reverse "browse-items" .year .month }}">Items</a>
+    <a href="/">Back to main</a>
     <div>
       {{ if .nextPage }} <a href="{{ .nextPage }}">Next</a> | {{end}}
       <a href="{{ .prevPage }}">Previous</a>
@@ -56,9 +57,9 @@
     <h2>Failed to get bills</h2>
     <p>{{.message}}</p>
     <a href="{{ call .reverse "browse-landing" }}">Current month's bills</a> |
+    <a href="/">Back to main</a>
     {{ end }}
   </div>
-  <a href="/">Back to main</a>
 </body>
 
 </html>

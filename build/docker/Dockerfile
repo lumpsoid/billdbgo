@@ -9,7 +9,9 @@ ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
 # Install necessary packages
 RUN apk update && apk add --no-cache \
     gcc \
-    musl-dev
+    musl-dev \
+    zbar \
+    imagemagick
 
 # Set working directory
 WORKDIR /billdb
@@ -42,6 +44,7 @@ ENV BILLDB_TEMPLATE_PATH=/server/templates/* \
     BILLDB_STATIC_PATH=/server/static \
     BILLDB_DB_PATH=/server/data/bills.db
 WORKDIR /server
+COPY --from=build /usr/bin/zbarimg /usr/bin/zbarimg
 COPY --from=build /billdb/server ./server
 COPY --from=build /billdb/templates ./templates
 COPY --from=build /billdb/static ./static

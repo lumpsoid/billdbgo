@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR</title>
+</head>
+
+<body>
+  <h1>Add bill from QR</h1>
+  <a href="{{call .reverse "index"}}">Home</a>
+  <form id="upload-form" method="post" enctype="multipart/form-data" action="{{call .reverse "bill-from-qr"}}">
+    <div>
+      <input type="file" id="image" name="file" accept="image/*"
+      onchange="displayImageInfo()">
+    </div>
+    <div id="file-info"></div>
+    <br>
+    <div>
+      <input type="submit" value="Insert">
+    </div>
+  </form>
+
+
+  <script>
+    function displayImageInfo() {
+      const fileInput = document.getElementById('image');
+      const fileInfoDiv = document.getElementById('file-info');
+      const form = document.getElementById('upload-form');
+      
+      const file = fileInput.files[0];
+
+      if (!file) {
+        fileInfoDiv.innerHTML = '';
+        imagePreview.src = '';
+        return;
+      }
+      
+      // Create a FileReader to read the file
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = function () {
+          // Set the desired width or height while maintaining aspect ratio
+          const maxWidth = 500; // Set the desired max width
+          const maxHeight = 500; // Set the desired max height
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate the new dimensions while maintaining the aspect ratio
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          // Create a canvas element to handle image compression
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          canvas.width = width;
+          canvas.height = height;
+
+          // Draw the image on the canvas
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Convert the canvas to a compressed image blob
+          canvas.toBlob(function (blob) {
+            const compressedFile = new File([blob], "optimized.jpeg", { type: 'image/jpeg' });
+
+            // Update the file input with the compressed file
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(compressedFile);
+            fileInput.files = dataTransfer.files;
+
+            // Display the compressed image and file information
+            const fileSize = (compressedFile.size / 1024).toFixed(2); // size in KB
+            fileInfoDiv.innerHTML = `
+              <p>File Size: ${fileSize} KB</p>
+            `;
+          }, 'image/jpeg', 0.8); // Adjust the quality as needed
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+
+</html>

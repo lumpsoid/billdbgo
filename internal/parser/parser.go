@@ -2,10 +2,12 @@ package parser
 
 import (
 	"billdb/internal/bill"
+	"strings"
 )
 
 // Parser defines the interface for parsing URLs.
 type Parser interface {
+  Type() string
 	Parse(u string) (*bill.Bill, error)
 }
 
@@ -26,9 +28,8 @@ func NewUnimplementedError(message string) *UnimplementedError {
 
 // GetBillParser creates a parser for a given URL.
 func GetBillParser(data string) (Parser, error) {
-  switch data {
-  case "https://suf.purs.gov.rs":
-		return &ParserSerbia{}, nil
+  if strings.HasPrefix(data, "https://suf.purs.gov.rs") {
+    return &ParserSerbia{}, nil
   }
 	return nil, NewUnimplementedError("No parser available for the given URL")
 }

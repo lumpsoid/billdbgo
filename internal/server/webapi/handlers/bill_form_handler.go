@@ -57,19 +57,19 @@ var (
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 			billCountry, err := country.Parse(b.Country)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 			billDate, err := bill.StringToDate(b.Date)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 
 			billNew := bill.New(
@@ -89,25 +89,26 @@ var (
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 			if billDupCount != 0 {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", billDupCount)
+        // TODO dupId implement to return ids of the duplicate bills 
 				r["dupId"] = "test"
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 
 			err = s.BillRepo.InsertBill(billNew)
 			if err != nil {
 				r["success"] = false
 				r["message"] = "Error while inserting bill to db"
-				return c.Render(http.StatusOK, "bill-form-response.html", r)
+				return c.Render(http.StatusOK, "bill-insert-response.html", r)
 			}
 			r["success"] = true
 			r["message"] = "Bill parsed successfully"
 			r["bill"] = b
-			return c.Render(http.StatusOK, "bill-form-response.html", r)
+			return c.Render(http.StatusOK, "bill-insert-response.html", r)
 		}
 	})
 )

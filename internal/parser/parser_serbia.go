@@ -54,6 +54,10 @@ type ItemJson struct {
 type ParserSerbia struct {
 }
 
+func (p *ParserSerbia) Type() string {
+  return "rs"
+}
+
 func cleanPrice(s string) string {
 	return strings.ReplaceAll(
 		strings.ReplaceAll(s, ".", ""),

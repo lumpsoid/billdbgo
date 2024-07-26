@@ -14,6 +14,7 @@
       <h2 style="display: inline;">Bill details</h2>
       <a href="{{call .reverse "bill-edit" .id}}">edit</a>
     </div>
+    <a href="{{call .reverse "browse-landing"}}">Bills</a>
     <table>
       <tr>
         <td>Id</td>
@@ -80,7 +81,6 @@
       {{ end }}
     </tbody>
   </table>
-  <a href="{{call .reverse "browse-landing"}}">Bills main</a>
 </body>
 
 </html>

@@ -515,6 +515,32 @@ func (r *SqliteBillRepository) CheckDuplicateBill(bill *bl.Bill) (int, error) {
 	return len(billArr), nil
 }
 
+func (r *SqliteBillRepository) CheckDuplicateBillByUrl(url string) (int, error) {
+	query := `SELECT invoice_id
+		FROM invoice
+		WHERE invoice_link = ?;`
+	rows, err := r.DB.Query(
+		query,
+    url,
+	)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var billArr []string
+	for rows.Next() {
+		var id string
+		err = rows.Scan(&id)
+		if err != nil {
+			return 0, err
+		}
+		billArr = append(billArr, id)
+	}
+
+	return len(billArr), nil
+}
+
 // function to use in place .Scan()
 //
 // to scan a row/rows into a bill/bills

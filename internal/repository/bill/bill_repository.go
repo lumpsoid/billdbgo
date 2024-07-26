@@ -10,7 +10,9 @@ type BillRepository interface {
 	GetDb() *sql.DB
 	ApplyMigration(sqlFilePath string) error
 	CheckDuplicateBill(bill *bl.Bill) (int, error)
+	CheckDuplicateBillByUrl(url string) (int, error)
 	InsertBill(bill *bl.Bill) error
+	InsertBillWithItems(bill *bl.Bill) error
 	GetBillByID(id string) (*bl.Bill, error)
 	UpdateBill(bill *bl.Bill) error
 	DeleteBill(id string) error

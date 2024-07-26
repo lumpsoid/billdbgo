@@ -3,9 +3,7 @@ package handlers
 import (
 	"billdb/internal/parser"
 	"billdb/internal/server"
-	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,77 +14,61 @@ type Response struct {
 	Bill    Bill
 }
 
-var BillFromLink = server.Get("/bill-from-link", func(s *server.Server) echo.HandlerFunc {
+var BillFromLink = server.Get("/bill/link", func(s *server.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		return c.Render(http.StatusOK, "bill-from-link.html", nil)
+		return c.Render(http.StatusOK, "bill-from-link.html", map[string]interface{}{})
 	}
 })
 
-var BillFromLinkResponse = server.Post("/bill-from-link", func(s *server.Server) echo.HandlerFunc {
+var BillFromLinkResponse = server.Post("/bill/link", func(s *server.Server) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var r Response
+		r := map[string]interface{}{
+			"success": false,
+		}
 		link := c.FormValue("link")
 
-		u, err := url.Parse(link)
+		p, err := parser.GetBillParser(link)
 		if err != nil {
-			c.Logger().Errorf("Error while parsing link from user: %v\n", err)
-			r.Success = false
-			r.Message = "Not valid URL"
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
-		}
-		p, err := parser.GetBillParser(u)
-		if err != nil {
-			r.Success = false
-			r.Message = fmt.Sprintf("%v\n", err)
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
-		}
-		bill, err := p.Parse(u)
-		if err != nil {
-			r.Success = false
-			r.Message = fmt.Sprintf("%v\n", err)
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
+      r["message"] = err.Error()
+			return c.Render(http.StatusOK, "bill-insert-response.html", r)
 		}
 
-		billDupCount, err := s.BillRepo.CheckDuplicateBill(bill)
+    dupCheck := false
+    if p.Type() == "rs" {
+      dupCount, err := s.BillRepo.CheckDuplicateBillByUrl(link)
+      if err != nil {
+        return err
+      }
+      if dupCount != 0 {
+        r["message"] = "Found duplicate bills"
+        r["dupInt"] = dupCount
+        return c.Render(http.StatusOK, "bill-insert-response.html", r)
+      }
+      dupCheck = true
+    }
+
+		b, err := p.Parse(link)
 		if err != nil {
-			r.Success = false
-			r.Message = fmt.Sprintf("%v\n", err)
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
-		}
-		if billDupCount > 0 {
-			r.Success = false
-			r.Message = fmt.Sprintf("Find duplicates = %d\n", billDupCount)
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
+      r["message"] = err.Error()
+			return c.Render(http.StatusOK, "bill-insert-response.html", r)
 		}
 
-		err = s.BillRepo.InsertBill(bill)
-		if err != nil {
-			r.Success = false
-			r.Message = "Error while inserting bill to db"
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
-		}
-		err = s.BillRepo.InsertItems(bill.Items)
-		if err != nil {
-			r.Success = false
-			r.Message = "Error while inserting items to db"
-			return c.Render(http.StatusOK, "bill-from-link-response.html", r)
-		}
-		r.Success = true
-		r.Message = "Bill parsed successfully"
-		r.Bill = Bill{
-			Id:       bill.Id,
-			Name:     bill.Name,
-			Tag:      bill.Tag.String,
-			Date:     bill.GetDateString(),
-			Price:    bill.Price,
-			Currency: bill.GetCurrencyString(),
-			// TODO exchange rate system
-			// ExchangeRate: bill.ExchangeRate,
-			Country: bill.GetCountryString(),
-		}
+    if dupCheck {
+      err = s.BillRepo.InsertBillWithItems(b)
+      if err != nil {
+        r["message"] = err.Error()
+        return c.Render(http.StatusOK, "bill-insert-response.html", r)
+      }
+    } else {
+        r["message"] = "Duplicates was not checked"
+        return c.Render(http.StatusOK, "bill-insert-response.html", r)
+    }
 
-		return c.Render(http.StatusOK, "bill-from-link-response.html", r)
+    r["success"] = true
+    r["message"] = "Bill parsed successfully"
+		r["bill"] = b
+		return c.Render(http.StatusOK, "bill-insert-response.html", r)
 	}
 },
 )
