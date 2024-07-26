@@ -40,15 +40,23 @@ RUN go build -o /billdb/server ./cmd/server/main.go
 
 # Production environment runs this stage
 FROM alpine:latest
+
 ENV BILLDB_TEMPLATE_PATH=/server/templates/* \
     BILLDB_STATIC_PATH=/server/static \
     BILLDB_DB_PATH=/server/data/bills.db
+
 WORKDIR /server
-COPY --from=build /usr/bin/zbarimg /usr/bin/zbarimg
+
+RUN apk update && apk add --no-cache \
+    zbar \
+    imagemagick
+
+# Copy server files
 COPY --from=build /billdb/server ./server
 COPY --from=build /billdb/templates ./templates
 COPY --from=build /billdb/static ./static
 COPY --from=build /billdb/data ./data
+
 EXPOSE 1323
 
 CMD ["/server/server"]
