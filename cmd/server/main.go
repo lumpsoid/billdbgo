@@ -27,7 +27,7 @@ func main() {
 
 	cfg, err := server.LoadConfig()
 	if err != nil {
-		logger.Fatal("Error on config load")
+		logger.Fatal(err.Error())
 		return
 	}
 
@@ -54,6 +54,7 @@ func main() {
 
 	// call to /index-style.css will redirect to cfg.StaticPath/index-style.css
 	e.Static("/static", cfg.StaticPath)
+	e.Static("/uploaded", cfg.QrPath)
 
 	e.Logger.SetLevel(log.INFO)
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{

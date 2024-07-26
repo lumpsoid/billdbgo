@@ -4,6 +4,7 @@ FROM golang:alpine AS development
 # Set environment variables
 ENV BILLDB_TEMPLATE_PATH=/billdb/templates/* \
     BILLDB_STATIC_PATH=/billdb/static \
+    BILLDB_QR_TMP_PATH=/billdb/qrtmp \
     BILLDB_DB_PATH=/billdb/data/bills.db
 
 # Install necessary packages
@@ -27,6 +28,7 @@ COPY ./internal ./internal
 # Copy the static files
 COPY ./web/templates ./templates
 COPY ./web/static ./static
+RUN mkdir "${BILLDB_QR_TMP_PATH}"
 
 # Create directory for db
 RUN mkdir ./data
@@ -43,6 +45,7 @@ FROM alpine:latest
 
 ENV BILLDB_TEMPLATE_PATH=/server/templates/* \
     BILLDB_STATIC_PATH=/server/static \
+    BILLDB_QR_TMP_PATH=/server/qrtmp \
     BILLDB_DB_PATH=/server/data/bills.db
 
 WORKDIR /server
