@@ -11,7 +11,7 @@ import (
 type Response struct {
 	Success bool
 	Message string
-	Bill    Bill
+	Bill    BillRequest
 }
 
 var BillFromLink = server.Get("/bill/link", func(s *server.Server) echo.HandlerFunc {

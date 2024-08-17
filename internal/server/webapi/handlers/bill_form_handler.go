@@ -14,7 +14,7 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
-type Bill struct {
+type BillRequest struct {
 	Id           string  `form:"id"`
 	Name         string  `form:"name"`
 	Tag          string  `form:"tag"`
@@ -45,7 +45,8 @@ var (
 	BillFormSubmit = server.Post("/bill/form", func(s *server.Server) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			r := make(map[string]interface{})
-			b := new(Bill)
+			b := new(BillRequest)
+      responseHtml := "bill-insert-response.html"
 
 			err := c.Bind(b)
 			if err != nil {
@@ -57,19 +58,19 @@ var (
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
 			billCountry, err := country.Parse(b.Country)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
 			billDate, err := bill.StringToDate(b.Date)
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
 
 			billNew := bill.New(
@@ -89,26 +90,35 @@ var (
 			if err != nil {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("%v", err)
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
 			if billDupCount != 0 {
 				r["success"] = false
 				r["message"] = fmt.Sprintf("Find duplicates in the db = %d", billDupCount)
         // TODO dupId implement to return ids of the duplicate bills 
 				r["dupId"] = "test"
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
 
 			err = s.BillRepo.InsertBill(billNew)
 			if err != nil {
 				r["success"] = false
 				r["message"] = "Error while inserting bill to db"
-				return c.Render(http.StatusOK, "bill-insert-response.html", r)
+				return c.Render(http.StatusOK, responseHtml, r)
 			}
+      
+      billFromDb, err := s.BillRepo.GetBillByID(billNew.Id)
+      if err != nil {
+				r["success"] = false
+				r["message"] = "Error while getting bill from db"
+				return c.Render(http.StatusOK, responseHtml, r)
+      }
+
+
 			r["success"] = true
 			r["message"] = "Bill parsed successfully"
-			r["bill"] = b
-			return c.Render(http.StatusOK, "bill-insert-response.html", r)
+			r["bill"] = billFromDb
+			return c.Render(http.StatusOK, responseHtml, r)
 		}
 	})
 )

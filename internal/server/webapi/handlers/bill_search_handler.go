@@ -50,7 +50,7 @@ var (
 			}
 			defer rows.Close()
 
-			var result []Bill
+			var result []BillRequest
 			for rows.Next() {
 				var (
 					Id       string
@@ -66,7 +66,7 @@ var (
 					r["message"] = "Error while scanning the database"
 					return c.Render(http.StatusOK, "search-bills-result.html", r)
 				}
-				result = append(result, Bill{
+				result = append(result, BillRequest{
 					Id:       Id,
 					Name:     Name,
 					Date:     Date,
