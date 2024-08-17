@@ -63,7 +63,7 @@ func TestDateParse(t *testing.T) {
 
 	for index, link := range links {
 
-		parser := &ParserSerbia{}
+		parser := &Parser{}
 		billObject, err := parser.Parse(link)
 		if err != nil {
 			t.Errorf("Error parsing URL: %v", err)
@@ -168,7 +168,7 @@ func TestParserSerbia_Parse(t *testing.T) {
 	// Implement tests for parsing variant 1 URL
 	fmt.Println("Testing serbian parser")
 
-	parser := &ParserSerbia{}
+	parser := &Parser{}
 
 	// Call the Parse method
 	billObject, err := parser.Parse(urlLink)

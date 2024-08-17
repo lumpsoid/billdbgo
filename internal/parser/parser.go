@@ -2,6 +2,8 @@ package parser
 
 import (
 	"billdb/internal/bill"
+	rs "billdb/internal/parser/serbia"
+	ru "billdb/internal/parser/russia"
 	"strings"
 )
 
@@ -29,7 +31,10 @@ func NewUnimplementedError(message string) *UnimplementedError {
 // GetBillParser creates a parser for a given URL.
 func GetBillParser(data string) (Parser, error) {
   if strings.HasPrefix(data, "https://suf.purs.gov.rs") {
-    return &ParserSerbia{}, nil
+    return &rs.Parser{}, nil
+  }
+  if strings.HasPrefix(data, "t=") {
+    return &ru.Parser{}, nil
   }
 	return nil, NewUnimplementedError("No parser available for the given URL")
 }

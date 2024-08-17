@@ -9,10 +9,15 @@ import (
 	"net/http"
 )
 
-type ParserRussia struct {
+type Parser struct {
+  Password string
 }
 
-func (p *ParserRussia) Parse(qrString string, password string) (*B.Bill, error) {
+func (p *Parser) Type() string {
+  return "ru"
+}
+
+func (p *Parser) Parse(qrString string) (*B.Bill, error) {
 	qrParams, err := parseQrString(qrString)
 	if err != nil {
 		return nil, err
@@ -59,7 +64,7 @@ func (p *ParserRussia) Parse(qrString string, password string) (*B.Bill, error) 
 		return nil, err
 	}
 
-	passwordHash, err := getPasswordHash(password)
+	passwordHash, err := getPasswordHash(p.Password)
 	if err != nil {
 		return nil, err
 

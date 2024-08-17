@@ -50,11 +50,11 @@ type ItemJson struct {
 	VatAmount     float64 `json:"VatAmount"`
 }
 
-// ParserSerbia is a parser for variant 1 of the URL.
-type ParserSerbia struct {
+// Parser is a parser for variant 1 of the URL.
+type Parser struct {
 }
 
-func (p *ParserSerbia) Type() string {
+func (p *Parser) Type() string {
   return "rs"
 }
 
@@ -167,7 +167,7 @@ func dateParse(dateLayout string, dateString string) (*time.Time, error) {
 	return &dateTime, nil
 }
 
-func (p *ParserSerbia) Parse(u string) (*bill.Bill, error) {
+func (p *Parser) Parse(u string) (*bill.Bill, error) {
 	doc, err := htmlquery.LoadURL(u)
 	if err != nil {
 		log.Error("Error loading URL: ", err)
