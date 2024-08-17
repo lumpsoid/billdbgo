@@ -73,13 +73,13 @@ func cleanWhiteSpace(s string) string {
 func queryNode(doc *html.Node, xpath string) (*html.Node, error) {
 	resultNode, err := htmlquery.Query(doc, xpath)
 	if resultNode == nil {
-		log.WithField("xpath", xpath).Errorf(
+		log.WithField("xpath", xpath).Error(
 			"Didn't find xpath.")
 		return nil, err
 	}
 	if err != nil {
-		log.WithField("xpath", xpath).Errorf(
-			"Error querying xpath: %e", err)
+		log.WithField("xpath", xpath).Error(
+			"Error querying xpath")
 		return nil, err
 	}
 	return resultNode, nil
