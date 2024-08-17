@@ -40,7 +40,7 @@ var QrHandler = server.Post(baseApiPath+"/qr", func(s *server.Server) echo.Handl
 
 		bill, err := p.Parse(req.Link)
 		if err != nil {
-			r.Message = fmt.Sprintf("Error while parsing the bill: %v", err)
+			r.Message = "Error while parsing the site"
 			return c.JSON(http.StatusInternalServerError, r)
 		}
 		b := BillApi{

@@ -50,7 +50,7 @@ var BillFromLinkResponse = server.Post("/bill/link", func(s *server.Server) echo
 
 		b, err := p.Parse(link)
 		if err != nil {
-      r["message"] = err.Error()
+      r["message"] = "Error while parsing the site"
 			return c.Render(http.StatusOK, "bill-insert-response.html", r)
 		}
 

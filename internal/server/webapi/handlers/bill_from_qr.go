@@ -77,7 +77,9 @@ var BillFromQrUpload = server.Post("/bill/qr", func(s *server.Server) echo.Handl
 
 		b, err := p.Parse(qrString)
 		if err != nil {
-			return err
+      r["success"] = false
+      r["message"] = "Error while parsing the site"
+      return c.Render(http.StatusOK, "bill-insert-response.html", r)
 		}
 
 		// if duplicates was not checked earlier
