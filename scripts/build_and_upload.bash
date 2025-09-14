@@ -125,29 +125,27 @@ for GOOS in "${GOOS_LIST[@]}"; do
     mkdir -p "$RELEASE_DIR"
 
     # Place the binary under a directory named after BINARY_BASE-VERSION
-    mkdir -p "$RELEASE_DIR/${BINARY_BASE}-${VERSION}"
-    cp "$OUT_PATH" "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/${BINARY_BASE}"
+    cp "$OUT_PATH" "$RELEASE_DIR/${BINARY_BASE}"
 
     # Copy web assets (templates and static) into the release dir
     # Adjust source paths if your project layout differs
     if [[ -d "./web/templates" ]]; then
-      cp -r ./web/templates "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/templates"
+      cp -r ./web/templates "$RELEASE_DIR/templates"
     else
       echo "Warning: ./web/templates not found"
     fi
 
     if [[ -d "./web/static" ]]; then
-      cp -r ./web/static "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/static"
+      cp -r ./web/static "$RELEASE_DIR/static"
     else
       echo "Warning: ./web/static not found"
     fi
 
     # Create tarball that contains the single top-level dir: billdbgo-VERSION/...
     TAR_PATH="${BUILD_DIR}/${BINARY_BASE}-${VERSION}-${GOOS}-${GOARCH}.tar.gz"
-    # change to RELEASE_DIR parent so tar contains BINARY_BASE-VERSION as top-level
     (
-      cd "$RELEASE_DIR" || exit 1
-      tar -czf "$TAR_PATH" "${BINARY_BASE}-${VERSION}"
+      cd "$BUILD_DIR" || exit 1
+      tar -czf "$(basename "$TAR_PATH")" "$(basename "$RELEASE_DIR")"
     )
     artifacts+=("$TAR_PATH")
 
