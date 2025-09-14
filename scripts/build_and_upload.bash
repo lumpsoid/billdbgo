@@ -105,11 +105,44 @@ for GOOS in "${GOOS_LIST[@]}"; do
     OUT_NAME="${BINARY_BASE}-${GOOS}-${GOARCH}"
     [[ "$GOOS" != "windows" ]] || OUT_NAME="${OUT_NAME}.exe"
     OUT_PATH="${BUILD_DIR}/${OUT_NAME}"
+
     echo "Building $OUT_PATH (GOOS=$GOOS GOARCH=$GOARCH)"
-    env GOOS=linux GOARCH=arm64 CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc go build -ldflags "-X main.version=${VERSION}" -o "$OUT_PATH" "$MAIN_PKG"
-    TAR_PATH="${OUT_PATH}.tar.gz"
-    tar -C "$BUILD_DIR" -czf "$TAR_PATH" "$(basename "$OUT_PATH")"
+    env GOOS="$GOOS" GOARCH="$GOARCH" CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc go build -ldflags "-X main.version=${VERSION}" -o "$OUT_PATH" "$MAIN_PKG"
+
+    # Create a temporary staging directory for the release layout
+    RELEASE_DIR="${BUILD_DIR}/${BINARY_BASE}-${VERSION}-${GOOS}-${GOARCH}"
+    rm -rf "$RELEASE_DIR"
+    mkdir -p "$RELEASE_DIR"
+
+    # Place the binary under a directory named after BINARY_BASE-VERSION
+    mkdir -p "$RELEASE_DIR/${BINARY_BASE}-${VERSION}"
+    cp "$OUT_PATH" "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/${BINARY_BASE}"
+
+    # Copy web assets (templates and static) into the release dir
+    # Adjust source paths if your project layout differs
+    if [[ -d "./web/templates" ]]; then
+      cp -r ./web/templates "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/templates"
+    else
+      echo "Warning: ./web/templates not found"
+    fi
+
+    if [[ -d "./web/static" ]]; then
+      cp -r ./web/static "$RELEASE_DIR/${BINARY_BASE}-${VERSION}/static"
+    else
+      echo "Warning: ./web/static not found"
+    fi
+
+    # Create tarball that contains the single top-level dir: billdbgo-VERSION/...
+    TAR_PATH="${BUILD_DIR}/${BINARY_BASE}-${VERSION}-${GOOS}-${GOARCH}.tar.gz"
+    # change to RELEASE_DIR parent so tar contains BINARY_BASE-VERSION as top-level
+    (
+      cd "$RELEASE_DIR" || exit 1
+      tar -czf "$TAR_PATH" "${BINARY_BASE}-${VERSION}"
+    )
     artifacts+=("$TAR_PATH")
+
+    # cleanup release staging but keep built binary if you want (optional)
+    rm -rf "$RELEASE_DIR"
   done
 done
 
@@ -117,6 +150,7 @@ printf 'Built artifacts:\n'
 printf '%s\n' "${artifacts[@]}"
 
 # Commit source changes (optional) and push tag
+git add "$VERSION_FILE"
 git commit -m "chore(release): ${VERSION}" || echo "No changes to commit."
 git tag -a "$VERSION" -m "Release $VERSION" || echo "Tag $VERSION exists."
 git push "$GIT_REMOTE" "$GIT_BRANCH"
