@@ -80,7 +80,7 @@ func main() {
 	// Start server
 	go func() {
 		if err := e.Start(":" + cfg.Port); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("shutting down the server")
+			e.Logger.Fatalf("shutting down the server: %v", err)
 		}
 	}()
 
