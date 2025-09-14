@@ -7,6 +7,7 @@ import (
 	"billdb/internal/bill/item"
 	"billdb/internal/bill/tag"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -55,7 +56,7 @@ type Parser struct {
 }
 
 func (p *Parser) Type() string {
-  return "rs"
+	return "rs"
 }
 
 func cleanPrice(s string) string {
@@ -168,9 +169,41 @@ func dateParse(dateLayout string, dateString string) (*time.Time, error) {
 }
 
 func (p *Parser) Parse(u string) (*bill.Bill, error) {
-	doc, err := htmlquery.LoadURL(u)
+	// custom transport with timeout
+	transport := &http.Transport{
+		DisableKeepAlives: true,
+	}
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   15 * time.Second,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
-		log.Error("Error loading URL: ", err)
+		log.Error("creating request: ", err)
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "+
+		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+
+	// fetch the page
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Error("request failed: ", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// check the HTTP status code
+	if resp.StatusCode != http.StatusOK {
+		log.Errorf("unexpected status %d (%s) for %s", resp.StatusCode, resp.Status, u)
+		return nil, fmt.Errorf("bad response: %d %s", resp.StatusCode, resp.Status)
+	}
+
+	// parse the HTML document
+	doc, err := htmlquery.Parse(resp.Body)
+	if err != nil {
+		log.Error("parsing HTML: ", err)
 		return nil, err
 	}
 
