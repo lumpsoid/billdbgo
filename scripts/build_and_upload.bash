@@ -107,7 +107,17 @@ for GOOS in "${GOOS_LIST[@]}"; do
     OUT_PATH="${BUILD_DIR}/${OUT_NAME}"
 
     echo "Building $OUT_PATH (GOOS=$GOOS GOARCH=$GOARCH)"
-    env GOOS="$GOOS" GOARCH="$GOARCH" CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc go build -ldflags "-X main.version=${VERSION}" -o "$OUT_PATH" "$MAIN_PKG"
+    case "$GOARCH" in
+      amd64) CC_COMPILER="x86_64-linux-gnu-gcc" ;;
+      arm64) CC_COMPILER="aarch64-linux-gnu-gcc" ;;
+      *) CC_COMPILER="" ;;
+    esac
+
+    if [[ -n "$CC_COMPILER" ]]; then
+      env GOOS="$GOOS" GOARCH="$GOARCH" CGO_ENABLED=1 CC="$CC_COMPILER" go build -ldflags "-X main.version=${VERSION}" -o "$OUT_PATH" "$MAIN_PKG"
+    else
+      env GOOS="$GOOS" GOARCH="$GOARCH" CGO_ENABLED=0 go build -ldflags "-X main.version=${VERSION}" -o "$OUT_PATH" "$MAIN_PKG"
+    fi
 
     # Create a temporary staging directory for the release layout
     RELEASE_DIR="${BUILD_DIR}/${BINARY_BASE}-${VERSION}-${GOOS}-${GOARCH}"
