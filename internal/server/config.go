@@ -15,6 +15,7 @@ type Config struct {
 	TemplatesPath string
 	StaticPath    string
 	QrPath        string
+	Port          string
 }
 
 var (
@@ -23,6 +24,7 @@ var (
 	envTemplatesPath = "BILLDB_TEMPLATE_PATH"
 	envStaticPath    = "BILLDB_STATIC_PATH"
 	envQrPath        = "BILLDB_QR_TMP_PATH"
+	envPort          = "BILLDB_PORT"
 )
 
 // LoadConfig tries CLI flags first, then env vars, then a config file (if provided via CLI).
@@ -38,6 +40,7 @@ func LoadConfig() (*Config, error) {
 	cliTemplatesPath := fs.String("templates-path", "", "path to templates (BILLDB_TEMPLATE_PATH)")
 	cliStaticPath := fs.String("static-path", "", "path to static files (BILLDB_STATIC_PATH)")
 	cliQrPath := fs.String("qr-path", "", "path to qr tmp (BILLDB_QR_TMP_PATH)")
+	cliPort := fs.String("port", "8080", "server's port (BILLDB_PORT)")
 
 	// config-file flag: path to KEY=VALUE file
 	cliConfigFile := fs.String("config-file", "", "path to config file with KEY=VALUE lines matching env var names")
@@ -60,6 +63,9 @@ func LoadConfig() (*Config, error) {
 		if c.QrPath == "" {
 			miss = append(miss, envQrPath)
 		}
+		if c.Port == "" {
+			miss = append(miss, envPort)
+		}
 		return miss
 	}
 
@@ -69,6 +75,7 @@ func LoadConfig() (*Config, error) {
 		TemplatesPath: strings.TrimSpace(*cliTemplatesPath),
 		StaticPath:    strings.TrimSpace(*cliStaticPath),
 		QrPath:        strings.TrimSpace(*cliQrPath),
+		Port:          strings.TrimSpace(*cliPort),
 	}
 
 	if len(missing(cliCfg)) == 0 {
@@ -93,6 +100,9 @@ func LoadConfig() (*Config, error) {
 	}
 	if v, ok := os.LookupEnv(envQrPath); ok {
 		envCfg.QrPath = strings.TrimSpace(v)
+	}
+	if v, ok := os.LookupEnv(envPort); ok {
+		envCfg.Port = strings.TrimSpace(v)
 	}
 
 	if len(missing(envCfg)) == 0 {
@@ -194,6 +204,8 @@ func readConfigFile(path string, cfg *Config) error {
 			cfg.StaticPath = val
 		case envQrPath:
 			cfg.QrPath = val
+		case envPort:
+			cfg.Port = val
 		default:
 			// ignore unknown keys
 		}
