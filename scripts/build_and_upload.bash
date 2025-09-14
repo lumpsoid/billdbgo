@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Config — edit if needed
 MAIN_PKG="./cmd/server"
-BINARY_BASE="server"
+BINARY_BASE="billdbgo"
 BUILD_DIR="dist"
 GOOS_LIST=("linux")
 GOARCH_LIST=("amd64" "arm64")
@@ -14,14 +14,22 @@ GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 # GitHub repo info (owner/repo). Try to infer from origin if not set.
 GITHUB_REPO="${GITHUB_REPO:-}"
 if [[ -z "$GITHUB_REPO" ]]; then
-  ORIGIN_URL="$(git config --get remote.$GIT_REMOTE.url || true)"
-  if [[ "$ORIGIN_URL" =~ github.com[:/](.+/.+)(\.git)?$ ]]; then
+  ORIGIN_URL="$(git config --get "remote.${GIT_REMOTE}.url" || true)"
+  # handle URLs like:
+  # git@github.com:owner/repo.git
+  # https://github.com/owner/repo.git
+  # https://github.com/owner/repo
+  if [[ "$ORIGIN_URL" =~ github.com[:/](.+/.+)$ ]]; then
     GITHUB_REPO="${BASH_REMATCH[1]}"
+    # strip optional .git suffix if present
+    GITHUB_REPO="${GITHUB_REPO%.git}"
+    echo "$GITHUB_REPO"
   else
     echo "Cannot infer GitHub repo from origin. Set GITHUB_REPO env (owner/repo)."
     exit 1
   fi
 fi
+
 
 # Auth token
 # Read GitHub token from file
@@ -48,12 +56,41 @@ fi
 
 
 # Version
+# read current version file (if exists)
 if [[ -f "$VERSION_FILE" ]]; then
-  VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
-  [[ -n "$VERSION" ]] || { echo "VERSION file empty"; exit 1; }
+  CURRENT_VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
+else
+  CURRENT_VERSION=""
+fi
+
+# read latest git tag (if any)
+if git rev-parse --verify --quiet refs/tags >/dev/null; then
+  LATEST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+else
+  LATEST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+fi
+LATEST_TAG="${LATEST_TAG:-<none>}"
+
+# decide default VERSION if no VERSION file
+if [[ -n "$CURRENT_VERSION" ]]; then
+  VERSION="$CURRENT_VERSION"
 else
   VERSION="v$(date -u '+%Y%m%d%H%M%S')"
 fi
+
+# prompt developer
+echo "Latest git tag: ${LATEST_TAG}"
+echo "Current VERSION file: ${CURRENT_VERSION:-<none>}"
+echo "Proposed release version: ${VERSION}"
+printf "Is this appropriate? (y/N): "
+read -r reply
+case "$reply" in
+  [yY]) ;;
+  *)
+    echo "Aborting per developer response."
+    exit 1
+    ;;
+esac
 
 echo "Repo: $GITHUB_REPO"
 echo "Version: $VERSION"
@@ -80,7 +117,6 @@ printf 'Built artifacts:\n'
 printf '%s\n' "${artifacts[@]}"
 
 # Commit source changes (optional) and push tag
-git add -A
 git commit -m "chore(release): ${VERSION}" || echo "No changes to commit."
 git tag -a "$VERSION" -m "Release $VERSION" || echo "Tag $VERSION exists."
 git push "$GIT_REMOTE" "$GIT_BRANCH"
