@@ -1,4 +1,4 @@
-package flutterapi
+package api
 
 import (
 	"billdb/internal/parser"

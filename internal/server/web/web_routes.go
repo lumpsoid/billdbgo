@@ -1,8 +1,8 @@
-package webapi
+package web
 
 import (
 	"billdb/internal/server"
-	h "billdb/internal/server/webapi/handlers"
+	h "billdb/internal/server/web/handlers"
 )
 
 func RegisterWebRoutes(s *server.Server) {

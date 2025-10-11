@@ -3,8 +3,8 @@ package main
 import (
 	repository "billdb/internal/repository/bill"
 	"billdb/internal/server"
-	flutter "billdb/internal/server/flutterapi"
-	web "billdb/internal/server/webapi"
+	"billdb/internal/server/api"
+	"billdb/internal/server/web"
 	"context"
 	"database/sql"
 	"html/template"
@@ -73,7 +73,7 @@ func main() {
 	s.Echo = e
 	// handlers
 	web.RegisterWebRoutes(&s)
-	flutter.FlutterApiRoutes(&s)
+	api.ApiRoutes(&s)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()

@@ -1,4 +1,4 @@
-package flutterapi
+package api
 
 import "billdb/internal/server"
 
@@ -24,7 +24,7 @@ type ResponseFlutter struct {
 	Bill    []BillApi `json:"bill"`
 }
 
-func FlutterApiRoutes(s *server.Server) {
+func ApiRoutes(s *server.Server) {
 	QrHandler(s)
 	FormHandler(s)
 	GetTagsHandler(s)
