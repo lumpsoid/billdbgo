@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -44,8 +45,9 @@ func main() {
 		Config:   cfg,
 	}
 
+	pattern := filepath.Join(cfg.TemplatesPath, "*.html")
 	t := &server.Template{
-		Templates: template.Must(template.ParseGlob(cfg.TemplatesPath)),
+		Templates: template.Must(template.ParseGlob(pattern)),
 	}
 
 	e := echo.New()
@@ -71,8 +73,11 @@ func main() {
 		},
 	}))
 	s.Echo = e
+
 	// handlers
-	web.RegisterWebRoutes(&s)
+	webGroup := e.Group("")
+	webHandlers := web.NewWebHandlers(cfg, e, billRepo)
+	webHandlers.RegisterRoutes(webGroup)
 	api.ApiRoutes(&s)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)

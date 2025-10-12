@@ -1,0 +1,116 @@
+package web
+
+import (
+	"billdb/internal/bill"
+	"billdb/internal/bill/country"
+	"billdb/internal/bill/currency"
+	"billdb/internal/bill/item"
+	"billdb/internal/bill/tag"
+	"fmt"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/segmentio/ksuid"
+)
+
+type BillRequest struct {
+	Id           string  `form:"id"`
+	Name         string  `form:"name"`
+	Tag          string  `form:"tag"`
+	Date         string  `form:"date"`
+	Price        float64 `form:"price"`
+	Currency     string  `form:"currency"`
+	ExchangeRate float64 `form:"exchange_rate"`
+	Country      string  `form:"country"`
+}
+
+func (w *WebHandlers) BillFormPage(c echo.Context) error {
+	currencies := currency.Available()
+	countries := country.Available()
+	tags, err := w.BillRepo.GetTags()
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "bill-form.html", map[string]interface{}{
+		"currencies": currencies,
+		"countries":  countries,
+		"tags":       tags,
+	})
+}
+
+func (w *WebHandlers) BillFormSubmit(c echo.Context) error {
+	r := make(map[string]interface{})
+	b := new(BillRequest)
+	responseHtml := "bill-insert-response.html"
+
+	err := c.Bind(b)
+	if err != nil {
+		return err
+	}
+	b.Id = ksuid.New().String()
+
+	billCurrency, err := currency.Parse(b.Currency)
+	if err != nil {
+		r["success"] = false
+		r["message"] = fmt.Sprintf("%v", err)
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+	billCountry, err := country.Parse(b.Country)
+	if err != nil {
+		r["success"] = false
+		r["message"] = fmt.Sprintf("%v", err)
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+	billDate, err := bill.StringToDate(b.Date)
+	if err != nil {
+		r["success"] = false
+		r["message"] = fmt.Sprintf("%v", err)
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+
+	billNew := bill.New(
+		b.Id,
+		b.Name,
+		*billDate,
+		b.Price,
+		billCurrency,
+		billCountry,
+		[]*item.Item{},
+		tag.New(b.Tag),
+		"",
+		"",
+	)
+
+	billDupCount, err := w.BillRepo.CheckDuplicateBill(billNew)
+	if err != nil {
+		r["success"] = false
+		r["message"] = fmt.Sprintf("%v", err)
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+	if billDupCount != 0 {
+		r["success"] = false
+		r["message"] = fmt.Sprintf("Find duplicates in the db = %d", billDupCount)
+		// TODO dupId implement to return ids of the duplicate bills
+		r["dupId"] = "test"
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+
+	err = w.BillRepo.InsertBill(billNew)
+	if err != nil {
+		r["success"] = false
+		r["message"] = "Error while inserting bill to db"
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+
+	billFromDb, err := w.BillRepo.GetBillByID(billNew.Id)
+	if err != nil {
+		r["success"] = false
+		r["message"] = "Error while getting bill from db"
+		return c.Render(http.StatusOK, responseHtml, r)
+	}
+
+	r["success"] = true
+	r["message"] = "Bill parsed successfully"
+	r["bill"] = billFromDb
+	return c.Render(http.StatusOK, responseHtml, r)
+}
