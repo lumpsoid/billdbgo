@@ -9,22 +9,23 @@ import (
 	"strings"
 )
 
-// keep your existing types
 type Config struct {
-	DbPath        string
-	TemplatesPath string
-	StaticPath    string
-	QrPath        string
-	Port          string
+	DbPath             string
+	TemplatesPath      string
+	StaticPath         string
+	QrPath             string
+	Port               string
+	DbFileNameTemplate string
 }
 
 var (
 	// env var names
-	envDbPath        = "BILLDB_DB_PATH"
-	envTemplatesPath = "BILLDB_TEMPLATE_PATH"
-	envStaticPath    = "BILLDB_STATIC_PATH"
-	envQrPath        = "BILLDB_QR_TMP_PATH"
-	envPort          = "BILLDB_PORT"
+	envDbPath             = "BILLDB_DB_PATH"
+	envTemplatesPath      = "BILLDB_TEMPLATE_PATH"
+	envStaticPath         = "BILLDB_STATIC_PATH"
+	envQrPath             = "BILLDB_QR_TMP_PATH"
+	envPort               = "BILLDB_PORT"
+	envDbFileNameTemplate = "BILLDB_DB_FILENAME_TEMPLATE"
 )
 
 // LoadConfig tries CLI flags first, then env vars, then a config file (if provided via CLI).
@@ -41,6 +42,7 @@ func LoadConfig() (*Config, error) {
 	cliStaticPath := fs.String("static-path", "", "path to static files (BILLDB_STATIC_PATH)")
 	cliQrPath := fs.String("qr-path", "", "path to qr tmp (BILLDB_QR_TMP_PATH)")
 	cliPort := fs.String("port", "8080", "server's port (BILLDB_PORT)")
+	cliDbTemplate := fs.String("db-filename-template", "", "write here")
 
 	// config-file flag: path to KEY=VALUE file
 	cliConfigFile := fs.String("config-file", "", "path to config file with KEY=VALUE lines matching env var names")
@@ -71,11 +73,12 @@ func LoadConfig() (*Config, error) {
 
 	// Try 1: CLI flags (must be complete)
 	cliCfg := &Config{
-		DbPath:        strings.TrimSpace(*cliDbPath),
-		TemplatesPath: strings.TrimSpace(*cliTemplatesPath),
-		StaticPath:    strings.TrimSpace(*cliStaticPath),
-		QrPath:        strings.TrimSpace(*cliQrPath),
-		Port:          strings.TrimSpace(*cliPort),
+		DbPath:             strings.TrimSpace(*cliDbPath),
+		TemplatesPath:      strings.TrimSpace(*cliTemplatesPath),
+		StaticPath:         strings.TrimSpace(*cliStaticPath),
+		QrPath:             strings.TrimSpace(*cliQrPath),
+		Port:               strings.TrimSpace(*cliPort),
+		DbFileNameTemplate: strings.TrimSpace(*cliDbTemplate),
 	}
 
 	if len(missing(cliCfg)) == 0 {
@@ -103,6 +106,9 @@ func LoadConfig() (*Config, error) {
 	}
 	if v, ok := os.LookupEnv(envPort); ok {
 		envCfg.Port = strings.TrimSpace(v)
+	}
+	if v, ok := os.LookupEnv(envDbFileNameTemplate); ok {
+		envCfg.DbFileNameTemplate = strings.TrimSpace(v)
 	}
 
 	if len(missing(envCfg)) == 0 {
@@ -206,6 +212,8 @@ func readConfigFile(path string, cfg *Config) error {
 			cfg.QrPath = val
 		case envPort:
 			cfg.Port = val
+		case envDbFileNameTemplate:
+			cfg.DbFileNameTemplate = val
 		default:
 			// ignore unknown keys
 		}
