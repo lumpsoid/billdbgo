@@ -10,7 +10,9 @@ GOARCH_LIST=("amd64" "arm64")
 VERSION_FILE="VERSION"
 GIT_REMOTE="${GIT_REMOTE:-origin}"
 GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
+# Auth token
+# Read GitHub token from file
+GITHUB_TOKEN_FILE="${GITHUB_TOKEN_FILE:-$HOME/.secrets/billdb/token}"
 # GitHub repo info (owner/repo). Try to infer from origin if not set.
 GITHUB_REPO="${GITHUB_REPO:-}"
 if [[ -z "$GITHUB_REPO" ]]; then
@@ -31,9 +33,6 @@ if [[ -z "$GITHUB_REPO" ]]; then
 fi
 
 
-# Auth token
-# Read GitHub token from file
-GITHUB_TOKEN_FILE="${GITHUB_TOKEN_FILE:-$HOME/.secrets/billdb/token}"
 
 if [[ ! -f "$GITHUB_TOKEN_FILE" ]]; then
   echo "GitHub token file not found: $GITHUB_TOKEN_FILE"
@@ -160,9 +159,25 @@ printf '%s\n' "${artifacts[@]}"
 # Commit source changes (optional) and push tag
 git add "$VERSION_FILE"
 git commit -m "chore(release): ${VERSION}" || echo "No changes to commit."
-git tag -a "$VERSION" -m "Release $VERSION" || echo "Tag $VERSION exists."
+
+# Create tag locally if it doesn't exist
+if git rev-parse "$VERSION" >/dev/null 2>&1; then
+  echo "Tag $VERSION already exists locally."
+else
+  git tag -a "$VERSION" -m "Release $VERSION"
+  echo "Created local tag $VERSION"
+fi
+
+# Push branch
 git push "$GIT_REMOTE" "$GIT_BRANCH"
-git push "$GIT_REMOTE" "$VERSION"
+
+# Push tag only if it doesn't exist on remote
+if git ls-remote --tags "$GIT_REMOTE" | grep -q "refs/tags/${VERSION}$"; then
+  echo "Tag $VERSION already exists on remote. Skipping tag push."
+else
+  git push "$GIT_REMOTE" "$VERSION"
+  echo "Pushed tag $VERSION to remote."
+fi
 
 # Create release via GitHub API if not exists
 API="https://api.github.com"
