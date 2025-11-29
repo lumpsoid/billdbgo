@@ -31,7 +31,7 @@ func (w *WebHandlers) BillFormPage(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(http.StatusOK, "bill-form.html", map[string]interface{}{
+	return c.Render(http.StatusOK, "bill-form.html", map[string]any{
 		"currencies": currencies,
 		"countries":  countries,
 		"tags":       tags,
@@ -39,32 +39,47 @@ func (w *WebHandlers) BillFormPage(c echo.Context) error {
 }
 
 func (w *WebHandlers) BillFormSubmit(c echo.Context) error {
-	r := make(map[string]interface{})
+	r := map[string]any{
+		"success": false,
+		"results": []map[string]any{},
+	}
 	b := new(BillRequest)
 	responseHtml := "bill-insert-response.html"
 
 	err := c.Bind(b)
 	if err != nil {
-		return err
+		r["message"] = fmt.Sprintf("Error binding form data: %v", err)
+		return c.Render(http.StatusOK, responseHtml, r)
 	}
 	b.Id = ksuid.New().String()
 
+	// Create a single result entry for this form submission
+	result := map[string]any{
+		"link":    "Manual form entry",
+		"success": false,
+	}
+
 	billCurrency, err := currency.Parse(b.Currency)
 	if err != nil {
-		r["success"] = false
-		r["message"] = fmt.Sprintf("%v", err)
+		result["message"] = fmt.Sprintf("Invalid currency: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Failed to process bill"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
+
 	billCountry, err := country.Parse(b.Country)
 	if err != nil {
-		r["success"] = false
-		r["message"] = fmt.Sprintf("%v", err)
+		result["message"] = fmt.Sprintf("Invalid country: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Failed to process bill"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
+
 	billDate, err := bill.StringToDate(b.Date)
 	if err != nil {
-		r["success"] = false
-		r["message"] = fmt.Sprintf("%v", err)
+		result["message"] = fmt.Sprintf("Invalid date format: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Failed to process bill"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
 
@@ -83,34 +98,42 @@ func (w *WebHandlers) BillFormSubmit(c echo.Context) error {
 
 	billDupCount, err := w.BillRepo.CheckDuplicateBill(billNew)
 	if err != nil {
-		r["success"] = false
-		r["message"] = fmt.Sprintf("%v", err)
+		result["message"] = fmt.Sprintf("Error checking duplicates: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Failed to process bill"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
+
 	if billDupCount != 0 {
-		r["success"] = false
-		r["message"] = fmt.Sprintf("Find duplicates in the db = %d", billDupCount)
-		// TODO dupId implement to return ids of the duplicate bills
-		r["dupId"] = "test"
+		result["message"] = "Found duplicate bills in database"
+		result["dupInt"] = billDupCount
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = fmt.Sprintf("Found %d duplicate bill(s)", billDupCount)
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
 
 	err = w.BillRepo.InsertBill(billNew)
 	if err != nil {
-		r["success"] = false
-		r["message"] = "Error while inserting bill to db"
+		result["message"] = fmt.Sprintf("Error inserting bill to database: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Failed to process bill"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
 
 	billFromDb, err := w.BillRepo.GetBillByID(billNew.Id)
 	if err != nil {
-		r["success"] = false
-		r["message"] = "Error while getting bill from db"
+		result["message"] = fmt.Sprintf("Error retrieving bill from database: %v", err)
+		r["results"] = append(r["results"].([]map[string]any), result)
+		r["message"] = "Bill inserted but failed to retrieve"
 		return c.Render(http.StatusOK, responseHtml, r)
 	}
 
+	result["success"] = true
+	result["message"] = "Bill inserted successfully"
+	result["bill"] = billFromDb
+	r["results"] = append(r["results"].([]map[string]any), result)
 	r["success"] = true
-	r["message"] = "Bill parsed successfully"
-	r["bill"] = billFromDb
+	r["message"] = "Bill processed successfully"
+
 	return c.Render(http.StatusOK, responseHtml, r)
 }

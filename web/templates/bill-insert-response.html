@@ -1,41 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Insert Response</title>
+    <style>
+        .result-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .summary {
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-radius: 5px;
+        }
+        .bill-details {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #007bff;
+        }
+        .bill-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .bill-details th, .bill-details td {
+            padding: 5px;
+            text-align: left;
+        }
+        .bill-details th {
+            font-weight: bold;
+            width: 150px;
+        }
+        .items-list {
+            margin-top: 10px;
+        }
+        .item {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+        }
+        .link-url {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all;
+        }
+    </style>
 </head>
-
 <body>
-  {{ if .success }}
-  <h2 style="display: inline;">Bill added successfully</h2>
-  <a href="{{call .reverse "index"}}">Home</a>
-  <a href="{{ call .reverse "bill-view" .bill.Id}}">View</a>
+    {{if .message}}
+    <div class="summary">
+        {{.message}}
+    </div>
+    {{end}}
 
-  <p>Id: {{ .bill.Id }}</p>
-  <p>Name: {{ .bill.Name }}</p>
-  <p>Tags: {{ .bill.Tag.String }}</p>
-  <p>Date: {{ .bill.Date }}</p>
-  <p>Price: {{ .bill.Price }}</p>
-  <p>Currency: {{ .bill.Currency }}</p>
-  <p>Country: {{ .bill.Country }}</p>
-  {{ else }}
-  <h2>Failed to add bill</h2>
-  <p>{{ .message }}</p>
-  {{ if .qrPath }}
-  <img src="/uploaded/{{.qrPath}}" alt="user's qr code response">
-  <br>
-  {{ end }}
-  {{if .dupId}}
-  <li>
-  <a href="{{call .reverse "bill-view" .dupId}}">View duplicate</a>
-  </li>
-  {{end}}
-  <a href="{{call .reverse "index"}}">Home</a>
-  {{ end }}
-  <a href="{{call .reverse "bill-from-qr"}}">Submit new qr</a>
+    {{if .results}}
+        {{range .results}}
+        <div class="result-container {{if .success}}success{{else if .dupInt}}warning{{else}}error{{end}}">
+            <div class="link-url">
+                <strong>Link:</strong> 
+                {{if ne .link "Manual form entry"}}
+                    <a href="{{.link}}" target="_blank" rel="noopener noreferrer" title="{{.link}}">{{.linkDisplay}}</a>
+                {{else}}
+                    {{.linkDisplay}}
+                {{end}}
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <strong>Status:</strong> {{.message}}
+            </div>
 
+            {{if .dupInt}}
+                <div style="margin-top: 5px; color: #856404;">
+                    Found {{.dupInt}} duplicate bill(s)
+                </div>
+            {{end}}
+
+            {{if .bill}}
+            <div class="bill-details">
+                <h3>Bill Details</h3>
+                <table>
+                    <tr>
+                        <th>Name:</th>
+                        <td>{{.bill.Name}}</td>
+                    </tr>
+                    <tr>
+                        <th>Date:</th>
+                        <td>{{.bill.Date.Format "2006-01-02 15:04:05"}}</td>
+                    </tr>
+                    <tr>
+                        <th>Price:</th>
+                        <td>{{printf "%.2f" .bill.Price}} {{.bill.Currency}}</td>
+                    </tr>
+                    <tr>
+                        <th>Country:</th>
+                        <td>{{.bill.Country}}</td>
+                    </tr>
+                    {{if .bill.Tag}}
+                    <tr>
+                        <th>Tag:</th>
+                        <td>{{.bill.Tag.String}}</td>
+                    </tr>
+                    {{end}}
+                    {{if .bill.Id}}
+                    <tr>
+                        <th>ID:</th>
+                        <td>{{.bill.Id}}</td>
+                    </tr>
+                    {{end}}
+                </table>
+
+                {{if .bill.Items}}
+                <div class="items-list">
+                    <h4>Items ({{len .bill.Items}}):</h4>
+                    {{range .bill.Items}}
+                    <div class="item">
+                        <strong>{{.Name}}</strong> - 
+                        {{printf "%.2f" .Price}} {{$.bill.Currency}}
+                        {{if .Quantity}}
+                        (Qty: {{.Quantity}})
+                        {{end}}
+                    </div>
+                    {{end}}
+                </div>
+                {{end}}
+
+                {{if .bill.BillText}}
+                <div style="margin-top: 10px;">
+                    <h4>Bill Text:</h4>
+                    <pre style="white-space: pre-wrap; background-color: #fff; padding: 10px; border: 1px solid #dee2e6;">{{.bill.BillText}}</pre>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+    {{else}}
+        {{if not .success}}
+        <div class="result-container error">
+            <strong>Error:</strong> {{if .message}}{{.message}}{{else}}Failed to process request{{end}}
+        </div>
+        {{end}}
+    {{end}}
 </body>
-
 </html>

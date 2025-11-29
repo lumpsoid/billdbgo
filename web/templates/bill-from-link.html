@@ -5,16 +5,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill from link</title>
+    <script src="/static/3p/htmx.2.0.0.min.js"></script>
+    <style>
+        .result-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .summary {
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-radius: 5px;
+        }
+        .bill-details {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 3px solid #007bff;
+        }
+        .bill-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .bill-details th, .bill-details td {
+            padding: 5px;
+            text-align: left;
+        }
+        .bill-details th {
+            font-weight: bold;
+            width: 150px;
+        }
+        .items-list {
+            margin-top: 10px;
+        }
+        .item {
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+        }
+        .link-url {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all;
+        }
+    </style>
 </head>
 
 <body>
   <h1 style="display: inline;">Bill from link</h1>
   <a href="/">Home</a>
-  <form action="{{call .reverse "bill-from-link"}}" method="post" target="_self">
-      <label for="linkField">Enter Link:</label>
-      <input type="text" id="linkField" name="link" placeholder="Enter URL">
-      <button id="submitLink">Submit</button>
+  
+  <form hx-post="{{call .reverse "bill-from-link"}}" 
+        hx-target="#response" 
+        hx-indicator="#loading">
+      <label for="linkField">Enter Links (one per line):</label>
+      <textarea id="linkField" 
+                name="link" 
+                placeholder="Enter URLs (one per line)" 
+                rows="10" 
+                cols="50"></textarea>
+      <br>
+      <button type="submit" id="submitLink">Submit</button>
+      <span id="loading" class="htmx-indicator">Processing...</span>
   </form>
+  
+  <div id="response"></div>
 </body>
 
 </html>
