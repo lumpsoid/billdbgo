@@ -7,5 +7,5 @@ import (
 )
 
 func (w *WebHandlers) SearchPage(c echo.Context) error {
-	return c.Render(http.StatusOK, "search.html", nil)
+	return c.Render(http.StatusOK, "search.html", map[string]any{})
 }
