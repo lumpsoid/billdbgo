@@ -73,7 +73,7 @@ func (w *WebHandlers) BillBrowse(c echo.Context) error {
 			Country  string
 			Tag      string
 		)
-		rows.Scan(&Id, &Name, &Date, &Price, &Currency, &Country, &Tag)
+		err = rows.Scan(&Id, &Name, &Date, &Price, &Currency, &Country, &Tag)
 		if err != nil {
 			r["message"] = "Error while scanning the database"
 			return c.Render(http.StatusOK, "browse-bills.html", r)

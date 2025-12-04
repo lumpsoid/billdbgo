@@ -54,7 +54,7 @@ func (w *WebHandlers) ItemsSearchQueary(c echo.Context) error {
 			Quantity string
 			Tag      *string
 		)
-		rows.Scan(&Id, &Name, &Date, &Price, &PriceOne, &Quantity, &Tag)
+		err = rows.Scan(&Id, &Name, &Date, &Price, &PriceOne, &Quantity, &Tag)
 		if err != nil {
 			r["message"] = "Error while scanning the database"
 			return c.Render(http.StatusOK, "search-items-result.html", r)
