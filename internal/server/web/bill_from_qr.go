@@ -12,7 +12,7 @@ import (
 )
 
 func (w *WebHandlers) BillFromQr(c echo.Context) error {
-	return c.Render(http.StatusOK, "bill-from-qr.html", map[string]interface{}{})
+	return c.Render(http.StatusOK, "bill-from-qr.html", map[string]any{})
 }
 
 func (w *WebHandlers) BillFromQrUpload(c echo.Context) error {

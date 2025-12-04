@@ -7,11 +7,11 @@ import (
 )
 
 func (w *WebHandlers) ItemsSearch(c echo.Context) error {
-	return c.Render(http.StatusOK, "search-items.html", map[string]interface{}{})
+	return c.Render(http.StatusOK, "search-items.html", map[string]any{})
 }
 
 func (w *WebHandlers) ItemsSearchQueary(c echo.Context) error {
-	r := make(map[string]interface{})
+	r := make(map[string]any)
 	r["success"] = false
 
 	queryBase := `SELECT
@@ -43,7 +43,7 @@ func (w *WebHandlers) ItemsSearchQueary(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var result []map[string]interface{}
+	var result []map[string]any
 	for rows.Next() {
 		var (
 			Id       string
@@ -59,7 +59,7 @@ func (w *WebHandlers) ItemsSearchQueary(c echo.Context) error {
 			r["message"] = "Error while scanning the database"
 			return c.Render(http.StatusOK, "search-items-result.html", r)
 		}
-		result = append(result, map[string]interface{}{
+		result = append(result, map[string]any{
 			"Id":       Id,
 			"Name":     Name,
 			"Date":     Date,

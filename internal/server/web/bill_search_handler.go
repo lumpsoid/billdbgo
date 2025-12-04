@@ -11,7 +11,7 @@ func (w *WebHandlers) BillsSearch(c echo.Context) error {
 }
 
 func (w *WebHandlers) BillSearchQueary(c echo.Context) error {
-	r := make(map[string]interface{})
+	r := make(map[string]any)
 	r["success"] = false
 
 	queryBase := `SELECT

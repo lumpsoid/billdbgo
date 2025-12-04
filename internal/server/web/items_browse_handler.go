@@ -10,7 +10,7 @@ import (
 )
 
 func (w *WebHandlers) ItemsBrowse(c echo.Context) error {
-	r := make(map[string]interface{})
+	r := make(map[string]any)
 	r["success"] = false
 
 	year, err := strconv.ParseInt(c.Param("y"), 10, 64)
