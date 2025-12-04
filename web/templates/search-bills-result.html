@@ -7,8 +7,8 @@
   <td>{{ .Price }}</td>
   <td>{{ .Currency }}</td>
   <td>{{ .Country }}</td>
-  <td><a href="{{ call $.reverse "bill-view" .Id}}">view</a></td>
-  <td><a href="{{ call $.reverse "bill-edit" .Id}}">edit</a></td>
+  <td><a href='{{ call $.reverse "bill-view" .Id}}'>view</a></td>
+  <td><a href='{{ call $.reverse "bill-edit" .Id}}'>edit</a></td>
 </tr>
 {{ end }}
 {{ else }}

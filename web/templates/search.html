@@ -11,10 +11,10 @@
 <body>
   <div>
     <h1 style="display: inline;">Search</h1>
-    <button hx-get="{{ call .reverse "bills-search" }}" hx-target="#search-variant">
+    <button hx-get='{{ call .reverse "bills-search" }}' hx-target="#search-variant">
       Bills
     </button>
-    <button hx-get="{{ call .reverse "items-search" }}" hx-target="#search-variant">
+    <button hx-get='{{ call .reverse "items-search" }}' hx-target="#search-variant">
       Items
     </button>
   </div>
