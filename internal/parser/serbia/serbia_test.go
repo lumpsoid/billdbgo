@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -98,7 +99,10 @@ func TestFetchItems(t *testing.T) {
 	}
 
 	billId := ksuid.New()
-	items, err := fetchItems(doc, &billId)
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
+	items, err := fetchItems(doc, &billId, client)
 	if err != nil {
 		t.Errorf("Failed to fetch items: %v", err)
 		return
@@ -148,7 +152,10 @@ func TestBisareItemFetch(t *testing.T) {
 		}
 
 		billId := ksuid.New()
-		items, err := fetchItems(doc, &billId)
+		client := &http.Client{
+			Timeout: 15 * time.Second,
+		}
+		items, err := fetchItems(doc, &billId, client)
 		if err != nil {
 			t.Errorf("Failed to fetch items: %v", err)
 			return
